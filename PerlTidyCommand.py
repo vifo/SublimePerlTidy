@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 import subprocess
+import os
 import os.path
 
 #
@@ -20,11 +21,12 @@ import os.path
 
 class PerlTidyCommand(sublime_plugin.TextCommand):
 
-	perltidy_cmd = '/Users/rbo/Perl/perls/current/bin/perltidy'
+	_perltidy_cmd = '/usr/bin/perltidy'
 
 	def run(self, edit):
-		if not os.path.isfile(self.perltidy_cmd):
-			sublime.error_message("Perltidy Error: Command not found:" + self.perltidy_cmd);
+
+		if not os.path.isfile(self.get_perltidy_cmd()):
+			sublime.error_message("Perltidy Error: Command not found:" + self.get_perltidy_cmd());
 			return
 
 		selection=0;
@@ -37,9 +39,20 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 			self.tidy_region(edit,sublime.Region(0L, self.view.size()))
 
 
+	def get_perltidy_cmd(self):
+		if os.path.isfile(self._perltidy_cmd):
+			return self._perltidy_cmd
+
+		for path in os.environ["PATH"].split(os.pathsep):
+			cmd=os.path.join(path, 'perltidy')
+			if os.path.isfile(cmd):
+				self._perltidy_cmd = cmd
+
+		return self._perltidy_cmd
+
 	def tidy_region(self,edit, region):
 		cmd = [
-			self.perltidy_cmd,
+			self.get_perltidy_cmd(),
 			"-sbdl","-bbt=1","-pt=2", "-nbbc", "-l=100","-ole=unix",
 			"-w",
 			"-se"
