@@ -11,20 +11,19 @@ import os.path
 # Added key binding:
 #	Sublime Text 2 -> Preferences -> User Key Bindings
 #		Add line: { "keys": ["ctrl+t"], "command":"perl_tidy"}
-# 
-# TODO: 
+#
+# TODO:
 #	* Implementing isEnabled
-#	* Configurable perltidy command
 #   * Read perltidyrc from project root, possible?
 #     or read perldity config from st2 config
 #
 
 class PerlTidyCommand(sublime_plugin.TextCommand):
 
-	_perltidy_cmd = '/usr/bin/perltidy'
+	_perltidy_cmd = None
 
 	def run(self, edit):
-
+		print "run"
 		if not os.path.isfile(self.get_perltidy_cmd()):
 			sublime.error_message("Perltidy Error: Command not found:" + self.get_perltidy_cmd());
 			return
@@ -40,6 +39,12 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
 
 	def get_perltidy_cmd(self):
+		print self.view.settings().get('perltidy_cmd')
+		if self._perltidy_cmd is None:
+			self._perltidy_cmd = self.view.settings().get('perltidy_cmd')
+			if self._perltidy_cmd is None:
+				self._perltidy_cmd = '/usr/bin/perltidy'
+
 		if os.path.isfile(self._perltidy_cmd):
 			return self._perltidy_cmd
 
