@@ -1,4 +1,4 @@
-# PerlTidy for Sublime Text 2 - rbo@cpan.org
+# PerlTidy for Sublime Text 2
 
 ## Added key binding:
 Sublime Text 2 -> Preferences -> User Key Bindings
@@ -11,6 +11,6 @@ Add line:
     "perltidy_cmd": "/opt/perl/bin/perltidy"
 
 ## TODO:
-	* Implementing isEnabled
-	* Read perltidyrc from project root, possible?
-	  or read perldity config from st2 config
+* Implementing isEnabled
+* Read perltidyrc from project root, possible?
+  or read perldity config from st2 config
