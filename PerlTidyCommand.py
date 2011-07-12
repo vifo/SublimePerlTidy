@@ -14,12 +14,11 @@ import os.path
 #
 # TODO:
 #	* Implementing isEnabled
-#   * Read perltidyrc from project root, possible?
-#     or read perldity config from st2 config
+#   * Read perltidy config from st2 config
 #
 
 class PerlTidyCommand(sublime_plugin.TextCommand):
-
+	_perltidy_rc = ['.perltidyrc', 'perltidyrc']
 	_perltidy_cmd = None
 
 	def run(self, edit):
@@ -36,7 +35,6 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
 		if selection == 0:
 			self.tidy_region(edit,sublime.Region(0L, self.view.size()))
-
 
 	def get_perltidy_cmd(self):
 		print self.view.settings().get('perltidy_cmd')
@@ -56,12 +54,21 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 		return self._perltidy_cmd
 
 	def tidy_region(self,edit, region):
+		# default command
 		cmd = [
 			self.get_perltidy_cmd(),
 			"-sbdl","-bbt=1","-pt=2", "-nbbc", "-l=100","-ole=unix",
 			"-w",
 			"-se"
 		]
+
+		# try to find a perltidy rc file
+		for folder in self.view.window().folders():
+			for tidyrc in self._perltidy_rc:
+				path = os.path.join(folder, tidyrc)
+				if os.path.isfile(path):
+					cmd = ['%s -pro="%s"' % (self.get_perltidy_cmd(), path)]
+					break
 
 		p = subprocess.Popen(
 			cmd,
