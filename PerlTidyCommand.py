@@ -35,7 +35,12 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 self.tidy_region(edit, r)
 
         if selection == 0:
+            cursor = self.view.sel()[0]
             self.tidy_region(edit, sublime.Region(0L, self.view.size()))
+            if cursor.empty():
+                self.view.sel().add(cursor)
+                self.view.sel().subtract(self.view.sel()[1])
+                self.view.show_at_center(self.view.sel()[0].begin())
 
     def get_perltidy_cmd(self):
         print self.view.settings().get('perltidy_cmd')
