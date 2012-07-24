@@ -8,10 +8,6 @@ import os.path
 # PerlTidy for Sublime Text 2
 #   rbo@cpan.org
 #
-# Added key binding:
-#   Sublime Text 2 -> Preferences -> User Key Bindings
-#       Add line: { "keys": ["ctrl+t"], "command":"perl_tidy"}
-#
 # TODO:
 #   * Implementing isEnabled
 #   * Read perltidy config from st2 config
