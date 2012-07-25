@@ -1,0 +1,20 @@
+{
+    "schema_version": "1.2",
+    "packages": [
+        {
+            "name": "PerlTidy",
+            "description": "Perl::Tidy plugin - a perl script indenter and reformatter",
+            "author": "rbo",
+            "homepage": "https://github.com/rbo/st2-perltidy",
+            "last_modified": "2012-07-25 22:00:00",
+            "platforms": {
+                "*": [
+                    {
+                        "version": "0.0.1",
+                        "url": "https://nodeload.github.com/rbo/st2-perltidy/zipball/v0.0.1"
+                    }
+                ]
+            }
+        }
+    ]
+}
