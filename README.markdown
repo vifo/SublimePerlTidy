@@ -4,7 +4,7 @@
 
 **With Sublime Text 2 Package Control:** Open *Package Control: Install Package*, search for "PerlTidy" and install.
 
-**Without Git:** Download the latest source from [GitHub](https://github.com/rbo/st2-perltidy/downloads) and copy the st2-perltidy folder to your Sublime Text *Packages* directory.
+**Without Git:** Download the latest source from [GitHub](https://github.com/rbo/st2-perltidy/downloads) and copy the folder *st2-perltidy* to your Sublime Text *Packages* directory.
 
 **With Git:** Clone the repository in your Sublime Text *Packages* directory:
 
@@ -44,11 +44,11 @@ Open *Sublime Text 2 -> Preferences -> Settings - Default* or *Settings - User*.
     // may also be used.
     //"perltidy_rc_paths": [ "perltidy.rc", ".perltidy.rc" ]
 
-    // Specify perltidy options. Defaults to ['-sbl', '-bbt=1', '-pt=2', '-nbbc', '-l=100', '-ole=unix', '-w', '-se']
-    // if not specified.
-    //"perltidy_options": ['-sbl', '-bbt=1', '-pt=2', '-nbbc', '-l=100', '-ole=unix', '-w', '-se']
+    // Specify perltidy options. Defaults to [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+    // if not given.
+    //"perltidy_options": [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
 
-Note that you may also override these global settings by project. In order to do this, add the above lines to your .sublime-project file.
+Note that all of the above settings may be overridden per project. In order to do this, add the above lines to your .sublime-project file.
 
 ### Default perltidy options
 
@@ -84,7 +84,7 @@ The default perltidy options are set as follows (you may override them by settin
 
 * -se
 
-  Errors go to STDERR. Please keep this setting, if you want perltidy error messages to apperar in a separate window. Details: [perltidy Documentation | Standard Error Output](http://perltidy.sourceforge.net/perltidy.html#se_standard_error_output).
+  Errors go to STDERR. Please ensure, that you include this settings, when changing default options. Otherwise, perltidy error messages won't appear in a separate window. Details: [perltidy Documentation | Standard Error Output](http://perltidy.sourceforge.net/perltidy.html#se_standard_error_output).
 
 ## TODOs:
 
@@ -92,4 +92,4 @@ The default perltidy options are set as follows (you may override them by settin
 
 ## Known issues:
 
-* On Win32, files containing UTF-8 characters (more specifically: characters that are not within the currently configured Win32 console charmap), will not be formatted properly. This is a limitation of the Win32 console I/O / Python subprocess combo, and may be fixed in the future with temporary files (See Issue #4).
+* On Win32, files containing UTF-8 characters (more specifically: characters that are not within the currently configured Win32 console character map), will not be formatted properly. This is a limitation of the Win32 console I/O / Python [subprocess](http://docs.python.org/2/library/subprocess.html) combo, and may be fixed in the future with temporary files (See [Issue #4](https://github.com/rbo/st2-perltidy/issues/4)).
