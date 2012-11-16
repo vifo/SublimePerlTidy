@@ -3,15 +3,15 @@
     "packages": [
         {
             "name": "PerlTidy",
-            "description": "Perl::Tidy plugin - a perl script indenter and reformatter",
+            "description": "Perl::Tidy plugin - A Perl script indenter and reformatter",
             "author": "rbo",
             "homepage": "https://github.com/rbo/st2-perltidy",
-            "last_modified": "2012-07-25 22:00:00",
+            "last_modified": "2012-11-16 09:30:00",
             "platforms": {
                 "*": [
                     {
-                        "version": "0.0.1",
-                        "url": "https://nodeload.github.com/rbo/st2-perltidy/zipball/v0.0.1"
+                        "version": "0.0.2",
+                        "url": "https://nodeload.github.com/rbo/st2-perltidy/zipball/v0.0.2"
                     }
                 ]
             }
