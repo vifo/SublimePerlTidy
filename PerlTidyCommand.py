@@ -16,6 +16,7 @@ DEFAULT_SETTINGS = {
     'perltidy_cmd': '/usr/bin/perltidy',
 }
 
+
 class PerlTidyCommand(sublime_plugin.TextCommand):
 
     _perltidy_cmd = None
@@ -82,7 +83,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
             user_provided_perltidy_cmd = True
 
             if cmd is None:
-                cmd = DEFAULTS['perltidy_cmd']
+                cmd = DEFAULT_SETTINGS['perltidy_cmd']
                 user_provided_perltidy_cmd = False
 
             if type(cmd) is not list:
@@ -122,12 +123,12 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
         return self._perltidy_cmd
 
     # Return list containing perltidy options as defined in user setting
-    # "perltidy_options" or DEFAULTS['perltidy_options']
+    # "perltidy_options" or DEFAULT_SETTINGS['perltidy_options']
     def get_perltidy_options(self):
         return self._perltidy_options
 
     # Return list containing possible perltidyrc paths as defined in user
-    # setting "perltidy_rc_paths" or DEFAULTS['perltidy_rc_paths']
+    # setting "perltidy_rc_paths" or DEFAULT_SETTINGS['perltidy_rc_paths']
     def get_perltidy_rc_paths(self):
         return self._perltidy_rc_paths
 
@@ -136,6 +137,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
     # perltidyrc path found, or None, if the project does not contain any
     # perltidyrc files.
     def get_perltidy_rc_path(self):
+        perltidy_rc_path = None
         try:
             for folder in self.view.window().folders():
                 for perltidy_rc_path in self.get_perltidy_rc_paths():
@@ -232,7 +234,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
         # and cleanup temporary files.
         if use_temporary_files:
             with codecs.open(perltidy_output_filepath, 'rb', encoding='utf-8') as fh:
-                output = fh.read();
+                output = fh.read()
             os.unlink(perltidy_input_filepath)
             os.unlink(perltidy_output_filepath)
 
