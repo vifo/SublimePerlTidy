@@ -1,2 +1,5 @@
 *.sublime-*
 *.pyc
+test*.pl
+COMMIT
+perltidyrc

@@ -1,10 +1,9 @@
 [
-  {
-    "keys": ["super+shift+t"],
-    "command":"perl_tidy",
-    "context":
-      [
-        { "key": "selector", "operator": "equal", "operand": "source.perl", "match_all": true }
-      ]
-  }
+	{
+		"keys": ["super+shift+t"],
+		"command": "perl_tidy",
+		"context": [
+			{ "key": "selector", "operator": "equal", "operand": "source.perl", "match_all": true }
+		]
+	}
 ]
