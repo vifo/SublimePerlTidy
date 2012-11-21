@@ -6,12 +6,12 @@
             "description": "Perl::Tidy plugin - A Perl script indenter and reformatter",
             "author": "rbo",
             "homepage": "https://github.com/rbo/st2-perltidy",
-            "last_modified": "2012-11-20 13:30:00",
+            "last_modified": "2012-11-23 11:35:00",
             "platforms": {
                 "*": [
                     {
-                        "version": "0.0.3",
-                        "url": "https://nodeload.github.com/rbo/st2-perltidy/zipball/v0.0.3"
+                        "version": "0.1.0",
+                        "url": "https://nodeload.github.com/rbo/st2-perltidy/zipball/v0.1.0"
                     }
                 ]
             }

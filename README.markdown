@@ -39,16 +39,24 @@ Defaults to `Ctrl+Shift+t` for Windows/Linux and `Super+Shift+t` for OS X, since
 Open `Preferences->Settings - Default` or `Preferences->Settings - User`. Add the following lines:
 
     // Specify full path to perltidy and optionally the Perl interpreter. If
-    // not specified, will search PATH for perltidy.
+    // not specified, will search PATH for perltidy. Please note, that on
+    // Win32, you must either specify either the full path to the batch
+    // wrapper "perltidy.bat"  (NOT "perltidy"), or specify the Perl
+    // interpreter path AND the path to the "raw" "perltidy" file. The latter
+    // is preferred, since we don't really need the batch wrapper at all.
+    // Settings below are known to work with a default Strawberry Perl
+    // installation.
     //"perltidy_cmd": "/opt/perl/bin/perltidy"
     //"perltidy_cmd": [ "C:\\strawberry\\perl\\bin\\perl.exe", "C:\\strawberry\\perl\\site\\bin\\perltidy" ]
+    //"perltidy_cmd": [ "C:\\strawberry\\perl\\site\\bin\\perltidy.bat" ]   // possible, but not needed
 
-    // Specify what perltidyrc files to search for within current project. Note,
-    // that only the first matching profile within the project will be used.
-    // Absolute paths may also be used.
-    //"perltidy_rc_paths": [ "perltidy.rc", ".perltidy.rc" ]
+    // Specify what perltidyrc files to search for within current project.
+    // Note, that only the first matching perltidyrc within the project will
+    // be used. Absolute paths may also be used.
+    //"perltidy_rc_paths": [ ".perltidyrc", "perltidyrc" ]
 
-    // Specify perltidy options. Defaults to [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+    // Specify perltidy options. Defaults to
+    // [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
     // if not given.
     //"perltidy_options": [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
 
@@ -57,11 +65,13 @@ Open `Preferences->Settings - Default` or `Preferences->Settings - User`. Add th
     // and errors will be displayed on the console.
     //"perltidy_log_level": 0
 
-Note that all of the above settings may be overridden per project. In order to do this, add the above lines to your .sublime-project file.
+    // If, for some reason, you'd like to disable PerlTidy entirely, set
+    // "perltidy_enabled" to false. Defaults to true.
+    //"perltidy_enabled": true
 
 ### Default perltidy options
 
-The default perltidy options are set as follows (you may override them by setting "perltidy_options" in your user preferences):
+The default perltidy options are set as follows (you may override them by setting "perltidy_options" in your user preferences). Please refer to the offical [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
 
 * -sbl
 
@@ -105,7 +115,26 @@ During normal operation, PerlTidy will emit warnings and errors to the Sublime T
 
 * 2 == Full debugging. In addition to the above, print where PerlTidy searches for perltidy and/or perltidyrc.
 
-## TODOs:
+### Common Errors
 
-* Implement isEnabled
+#### Windows Error 193
+
+You are running on Win32, and have set a custom perltidy path via user setting "perltidy_cmd". While trying to run, PerlTidy bails out with the following error message on the ST2 console:
+
+    PerlTidy: Unable to run perltidy: "C:\Strawberry\perl\site\bin\perltidy" ...
+    PerlTidy: OS error was: WindowsError(193, '...')
+    PerlTidy: Maybe you have specified the path to "perltidy" instead of "perltidy.bat" in your "perltidy_cmd"?
+
+You have specified the path to the *perltidy* Perl file, instead of the batch wrapper *perltidy.bat*. Win32 is unable to execute this file directly. Yes, running this file in *cmd.exe* will work, but only due to the way, how cmd.exe handles files without an extension: it will add extensions in environment variable *PATHEXT*, eventually finally find the *perltidy.bat* and run it.
+
+TL/DR: Assuming you are running a vanilla installation of [Strawberry Perl](http://strawberryperl.com/): adjust "perltidy_cmd" user setting to either:
+
+    "perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]
+
+or to the following, if you really need to use the batch wrapper for some (non-obvious) reason:
+
+    "perltidy_cmd": "C:\\Strawberry\\perl\\site\\bin\\perltidy.cmd"
+
+## TODOs
+
 * Implement automatic tidying upon save.

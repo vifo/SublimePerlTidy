@@ -5,16 +5,30 @@ import os
 import os.path
 import tempfile
 import codecs
+import exceptions
 
 # PerlTidy for Sublime Text 2
 #   rbo@cpan.org
 
 DEFAULT_SETTINGS = {
+    'perltidy_enabled': True,
     'perltidy_log_level': 0,
     'perltidy_options': ['-sbl', '-bbt=1', '-pt=2', '-nbbc', '-l=100', '-ole=unix', '-w', '-se'],
+    'perltidy_platform_default_paths': {
+        'nt': [
+            ["C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy"],
+            ["C:\\Strawberry\\perl\\site\\bin\\perltidy.bat"],
+        ],
+        'default': [
+            ['/usr/bin/perltidy'],
+        ],
+    },
     'perltidy_rc_paths': ['.perltidyrc', 'perltidyrc'],
-    'perltidy_cmd': '/usr/bin/perltidy',
 }
+
+class PerlTidyRuntimeError(Exception):
+    def __init__(self, value):
+        self.value = value
 
 
 class PerlTidyCommand(sublime_plugin.TextCommand):
@@ -37,14 +51,14 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 'to documentation at https://github.com/rbo/st2-perltidy for details.')
             return
 
-        # Check, if we have any non-empty selections and tidy them.
+        # Check, if we have any non-empty regions and tidy them.
         regions_tidied = 0
         for region in self.view.sel():
             if not region.empty():
                 regions_tidied += 1
                 self.tidy_region(edit, region)
 
-        # If no selections have been tidied so far, go ahead and tidy entire
+        # If no regions have been tidied so far, go ahead and tidy entire
         # view. Reposition cursor after tidying up.
         if regions_tidied == 0:
             cursor_pos = self.view.sel()[0]
@@ -55,70 +69,122 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                         self.view.sel().subtract(self.view.sel()[1])
                     self.view.show_at_center(self.view.sel()[0].begin())
 
-    def pp(self, string):
-        result = []
+    # Report to Sublime Text 2 whether PerlTidy is enabled, or not.
+    def is_enabled(self):
+        return self.view.settings().get('perltidy_enabled', DEFAULT_SETTINGS['perltidy_enabled'])
 
-        if type(string) is list:
-            for i in string:
-                result.append('"' + i + '"')
+    # Check, if given perltidy command is valid. For now, we can only check,
+    # if the elements given in list cmd are valid file system objects. Returns
+    # True, if command appears to be valid, False otherwise.
+    def is_valid_perltidy_cmd(self, cmd=[], cmd_source=None):
+        if cmd is None or len(cmd) == 0:
+            return False
+
+        self.log(2, 'Checking for perltidy (' + cmd_source + '): ' + self.pp(cmd))
+        if not os.path.isfile(cmd[0]):
+            if cmd_source == 'user':
+                self.log(0, 'Command {0} specified in user setting "perltidy_cmd" could not be found. Ignoring and searching for perltidy in PATH'.format(pp(cmd[0])))
+            else:
+                self.log(2, 'Command not found: ' + self.pp(cmd[0]))
+            return False
+
+        # Passed command seems to be valid.
+        return True
+
+    # Search for perltidyrc file in current project, based on possible file
+    # paths configured in user setting "perltidy_rc_paths". Return first
+    # perltidyrc path found, or None, if the project does not contain any
+    # perltidyrc files.
+    def find_perltidyrc_in_project(self):
+        perltidy_rc_path = None
+
+        try:
+            for folder in self.view.window().folders():
+                for perltidy_rc_path in self.get_perltidy_rc_paths():
+
+                    # Construct absolute path, if not absolute yet.
+                    perltidy_rc_path = perltidy_rc_path if os.path.isabs(perltidy_rc_path) else os.path.join(folder, perltidy_rc_path)
+                    self.log(2, 'Checking for perltidyrc: ' + self.pp(perltidy_rc_path))
+
+                    # Does this perltidyrc file exist?
+                    if os.path.isfile(perltidy_rc_path):
+                        self.log(1, 'Using perltidyrc: ' + self.pp(perltidy_rc_path))
+                        raise StopIteration()
+                    else:
+                        self.log(2, 'File not found: ' + self.pp(perltidy_rc_path))
+                        perltidy_rc_path = None
+        except StopIteration:
+            pass
         else:
-            result.append('"' + string + '"')
+            self.log(2, 'No perltidyrc found in project')
 
-        return ' '.join(result)
+        return perltidy_rc_path
 
-    def load_settings(self):
-        if self._perltidy_log_level is None:
-            self._perltidy_log_level = self.view.settings().get('perltidy_log_level', DEFAULT_SETTINGS['perltidy_log_level'])
-        if self._perltidy_options is None:
-            self._perltidy_options = self.view.settings().get('perltidy_options', DEFAULT_SETTINGS['perltidy_options'])
-        if self._perltidy_rc_paths is None:
-            self._perltidy_rc_paths = self.view.settings().get('perltidy_rc_paths', DEFAULT_SETTINGS['perltidy_rc_paths'])
+    # Find perltidy in PATH.
+    def find_perltidy_in_path(self):
+        cmd = []
+
+        perltidy_filename = 'perltidy'
+        if os.name == 'nt':
+            perltidy_filename += '.bat'
+
+        for path in os.environ["PATH"].split(os.pathsep):
+            cmd_path = os.path.join(path, perltidy_filename)
+            cmd = [cmd_path]
+
+            if self.is_valid_perltidy_cmd(cmd, cmd_source='path'):
+                break
+
+        return cmd
+
+    # Search for perltidy in platform default locations.
+    def find_perltidy_in_platform_default_paths(self):
+        cmds = DEFAULT_SETTINGS['perltidy_platform_default_paths']['default']
+        if os.name == 'nt':
+            cmds = DEFAULT_SETTINGS['perltidy_platform_default_paths']['nt']
+
+        for cmd in cmds:
+            if self.is_valid_perltidy_cmd(cmd, cmd_source='platform defs'):
+                return cmd
+
+        return None
 
     def get_perltidy_cmd(self):
 
-        # If not already done, load perltidy command from settings, or fall
-        # back to default command defined in class above.
+        # Determine perltidy command to run in the following order:
+        # 1. From user setting "perltidy_cmd"
+        # 2. Within PATH (search for "perltidy" or "perltidy.bat" on Win32)
+        # 3. From platform specific defaults
         if self._perltidy_cmd is None:
-            cmd = self.view.settings().get('perltidy_cmd')
-            user_provided_perltidy_cmd = True
+            cmd = None
 
-            if cmd is None:
-                cmd = DEFAULT_SETTINGS['perltidy_cmd']
-                user_provided_perltidy_cmd = False
+            try:
+                # 1. From user setting "perltidy_cmd", this may be either a
+                # single string or a list, handle appropriately.
+                cmd = self.view.settings().get('perltidy_cmd')
+                if cmd is not None and type(cmd) is not list:
+                    cmd = [cmd]
 
-            if type(cmd) is not list:
-                cmd = [cmd]
+                if self.is_valid_perltidy_cmd(cmd, cmd_source='user'):
+                    raise StopIteration()
 
-            # First element of self._perltidy_cmd must be (an executable)
-            # file. If not assume that the command is invalid and try to find
-            # perltidy within path. Emit warning, if the command is invalid,
-            # and has been provided by the user.
-            if not os.path.isfile(cmd[0]):
-                if user_provided_perltidy_cmd:
-                    print 'PerlTidy: Command {0} specified in user setting "perltidy_cmd" could not be found. Ignoring and searching perltidy in PATH.'.format(self.pp(cmd[0]))
-                cmd = None
+                # 2. Within PATH (search for "perltidy" or "perltidy.bat" on Win32)
+                # cmd = self.find_perltidy_in_path()
+                # if cmd is not None:
+                #     #raise StopIteration()
+                #     pass
 
-                # Search for perltidy (or perltidy.bat on Win32) within PATH.
-                perltidy_filename = 'perltidy'
-                if os.name == 'nt':
-                    perltidy_filename += '.bat'
+                # 3. From platform specific defaults
+                cmd = self.find_perltidy_in_platform_default_paths()
+                if cmd is not None:
+                    raise StopIteration()
 
-                for path in os.environ["PATH"].split(os.pathsep):
-                    cmd_path = os.path.join(path, perltidy_filename)
-                    if self._perltidy_log_level >= 2:
-                        print 'PerlTidy: Checking for perltidy: ' + self.pp(cmd_path)
-
-                    if os.path.isfile(cmd_path):
-                        if self._perltidy_log_level >= 1:
-                            print 'PerlTidy: Using perltidy: ' + self.pp(cmd_path)
-                        cmd = [cmd_path]
-                        break
-
-            # Save cmd for later usage.
-            if cmd is not None:
-                if self._perltidy_log_level >= 2:
-                    print 'PerlTidy: Using perltidy command: ' + self.pp(cmd)
+            except StopIteration:
+                # Save command for later usage
+                self.log(1, 'Using perltidy: ' + self.pp(cmd))
                 self._perltidy_cmd = cmd
+            else:
+                pass
 
         return self._perltidy_cmd
 
@@ -132,41 +198,41 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
     def get_perltidy_rc_paths(self):
         return self._perltidy_rc_paths
 
-    # Search for perltidyrc file in current project, based on possible file
-    # paths configured in user setting "perltidy_rc_paths". Return first
-    # perltidyrc path found, or None, if the project does not contain any
-    # perltidyrc files.
-    def get_perltidy_rc_path(self):
-        perltidy_rc_path = None
-        try:
-            for folder in self.view.window().folders():
-                for perltidy_rc_path in self.get_perltidy_rc_paths():
+    # Load PerlTidy settings from Sublime preferences.
+    def load_settings(self, force=False):
+        if force or self._perltidy_log_level is None:
+            self._perltidy_log_level = self.view.settings().get('perltidy_log_level', DEFAULT_SETTINGS['perltidy_log_level'])
+        if force or self._perltidy_options is None:
+            self._perltidy_options = self.view.settings().get('perltidy_options', DEFAULT_SETTINGS['perltidy_options'])
+        if force or self._perltidy_rc_paths is None:
+            self._perltidy_rc_paths = self.view.settings().get('perltidy_rc_paths', DEFAULT_SETTINGS['perltidy_rc_paths'])
 
-                    # Construct absolute path, if not absolute yet.
-                    perltidy_rc_path = perltidy_rc_path if os.path.isabs(perltidy_rc_path) else os.path.join(folder, perltidy_rc_path)
+    # Simple logging.
+    def log(self, level, message):
+        if level <= self._perltidy_log_level:
+            print 'PerlTidy: ' + message
 
-                    if self._perltidy_log_level >= 2:
-                        print 'PerlTidy: Checking for perltidyrc: ' + self.pp(perltidy_rc_path)
+    # Pretty print given string for diagnostic output.
+    def pp(self, string):
+        result = []
 
-                    # Does this perltidyrc file exist?
-                    if os.path.isfile(perltidy_rc_path):
-                        if self._perltidy_log_level >= 2:
-                            print 'PerlTidy: Using perltidyrc: ' + self.pp(perltidy_rc_path)
-                        raise StopIteration()
-                    else:
-                        perltidy_rc_path = None
+        if type(string) is list:
+            for i in string:
+                result.append('"' + i + '"')
+        else:
+            result.append('"' + string + '"')
 
-        except StopIteration:
-            pass
-
-        if perltidy_rc_path is None and self._perltidy_log_level >= 2:
-            print 'PerlTidy: No perltidyrc found in project'
-
-        return perltidy_rc_path
+        return ' '.join(result)
 
     # Tidy given region; returns True on success or False on perltidy runtime
     # error.
     def tidy_region(self, edit, region):
+
+        # Map WindowsError exception to None on non-Win32
+        try:
+            WindowsError
+        except NameError:
+            WindowsError = None
 
         # Build command.
         cmd = []
@@ -175,7 +241,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
         # Check, if we have a perltidyrc in the current project and append to
         # command.
-        perltidy_rc_path = self.get_perltidy_rc_path()
+        perltidy_rc_path = self.find_perltidyrc_in_project()
         if perltidy_rc_path is not None:
             cmd.append('-pro=' + perltidy_rc_path)
 
@@ -224,26 +290,57 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
             cmd.append('-o=' + perltidy_output_filepath)
             input = None
 
-        if self._perltidy_log_level >= 1:
-            print 'PerlTidy: Running command: ' + ' '.join(cmd)
+        # Show time!
+        output, error = None, None
+        self.log(1, 'Running command: ' + self.pp(cmd))
+        try:
+            p = subprocess.Popen(cmd, **subprocess_args)
+            output, error = p.communicate(input)
 
-        p = subprocess.Popen(cmd, **subprocess_args)
-        output, error = p.communicate(input)
+            # If we're using temporary files for I/O, load output from output
+            # file and cleanup temporary files.
+            if use_temporary_files:
+                with codecs.open(perltidy_output_filepath, 'rb', encoding='utf-8') as fh:
+                    output = fh.read()
+                os.unlink(perltidy_input_filepath)
+                os.unlink(perltidy_output_filepath)
 
-        # If we're using temporary files for I/O, load output from output file
-        # and cleanup temporary files.
-        if use_temporary_files:
-            with codecs.open(perltidy_output_filepath, 'rb', encoding='utf-8') as fh:
-                output = fh.read()
-            os.unlink(perltidy_input_filepath)
-            os.unlink(perltidy_output_filepath)
+            if error:
+                raise PerlTidyRuntimeError(error)
 
-        # Replace region with output, if we had no errors. Otherwise create a
-        # scratch window with perltidy error output.
-        if not error:
-            self.view.replace(edit, region, output)
-            return True
-        else:
+        # Handle OS errors. Check, if we can give the user some hints.
+        except (WindowsError, OSError) as e:
+            print 'PerlTidy: Unable to run perltidy: ' + self.pp(cmd)
+            print 'PerlTidy: OS error was: ' + repr(e)
+
+            hints = []
+
+            # Check current error and give user some hints about error reason
+            if os.name == 'nt' and type(e) is exceptions.WindowsError:
+                if e.winerror == 193:       # bad exe format
+                    if os.path.basename(cmd[0]) == 'perltidy':
+                        hints.append(
+                            'Maybe you have specified the path to "perltidy" instead ' +
+                            'of "perltidy.bat" in your "perltidy_cmd"?')
+
+            if len(hints) == 0:
+                if self._perltidy_log_level < 2:
+                    hints.append(
+                        'Try to increase PerlTidy log level via user setting ' +
+                        '"perltidy_log_level" and try again')
+
+            if len(hints):
+                for hint in hints:
+                    print 'PerlTidy: ' + hint
+
+            sublime.error_message(
+                'PerlTidy: Unable to run perltidy. Please inspect console (hit ' +
+                'Ctrl+` or select View->Show Console from menu) for detailed diagnostic ' +
+                'messages, error output and hints.')
+            return False
+
+        # Handle perltidy errors. Show them in scratch window.
+        except PerlTidyRuntimeError as e:
             results = self.view.window().new_file()
             results.set_scratch(True)
             results.set_name('PerlTidy: Error output')
@@ -251,3 +348,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
             results.insert(edit, 0, error)
             results.end_edit(edit)
             return False
+
+        # Everything went okay so far.
+        else:
+            self.view.replace(edit, region, output)
+            return True
