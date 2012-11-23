@@ -83,7 +83,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
         self.log(2, 'Checking for perltidy (' + cmd_source + '): ' + self.pp(cmd))
         if not os.path.isfile(cmd[0]):
             if cmd_source == 'user':
-                self.log(0, 'Command {0} specified in user setting "perltidy_cmd" could not be found. Ignoring and searching for perltidy in PATH'.format(pp(cmd[0])))
+                self.log(0, 'Command {0} specified in user setting "perltidy_cmd" could not be found. Ignoring and searching for perltidy in PATH'.format(self.pp(cmd[0])))
             else:
                 self.log(2, 'Command not found: ' + self.pp(cmd[0]))
             return False
