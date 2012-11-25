@@ -275,9 +275,6 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
             # Create temporary files for input/output and reopen them with
             # codecs.open, so we can specify an encoding for the files. At
             # least with Python 2.6, there seems to be no other option.
-            subprocess_args['stdout'] = None
-            subprocess_args['stdin'] = None
-
             perltidy_input_fh, perltidy_input_filepath = tempfile.mkstemp()
             perltidy_output_fh, perltidy_output_filepath = tempfile.mkstemp()
             os.close(perltidy_input_fh)
@@ -310,8 +307,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
         # Handle OS errors. Check, if we can give the user some hints.
         except (WindowsError, OSError) as e:
-            print 'PerlTidy: Unable to run perltidy: ' + self.pp(cmd)
-            print 'PerlTidy: OS error was: ' + repr(e)
+            self.log(0, 'Unable to run perltidy: ' + self.pp(cmd))
+            self.log(0, 'PerlTidy: OS error was: ' + repr(e))
 
             hints = []
 
@@ -331,11 +328,11 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
             if len(hints):
                 for hint in hints:
-                    print 'PerlTidy: ' + hint
+                    self.log(0, hint)
 
             sublime.error_message(
-                'PerlTidy: Unable to run perltidy. Please inspect console (hit ' +
-                'Ctrl+` or select View->Show Console from menu) for detailed diagnostic ' +
+                'PerlTidy: Unable to run perltidy. Please inspect console (hit Ctrl+` ' +
+                'or select View->Show Console from menu) for detailed diagnostic ' +
                 'messages, error output and hints.')
             return False
 
