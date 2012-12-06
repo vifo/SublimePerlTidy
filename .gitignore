@@ -1,5 +1,11 @@
-*.sublime-*
 *.pyc
-test*.pl
+*.sublime-*
+.coverage
+.pythoscope
 COMMIT
+htmlcov
+misc
 perltidyrc
+test*.pl
+nohup.out
+

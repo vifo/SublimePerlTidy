@@ -1,6 +1,6 @@
 [
     {
-        "caption": "Perl: Tidy",
+        "caption": "PerlTidy: Tidy",
         "command": "perl_tidy"
     }
 ]

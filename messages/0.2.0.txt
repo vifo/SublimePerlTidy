@@ -1,0 +1,22 @@
+PerlTidy for Sublime Text 2
+===========================
+
+Version: 0.2.0
+
+What's new?
+-----------
+* Support for Cygwin added.
+
+* Automatic detection of Strawberry Perl, ActivePerl and Cygwin under Windows
+  added.
+
+* User setting "perltidy_options_take_precedence" added. If set to "true",
+  which is the default, options from user setting "perltidy_options" will
+  take precedence over options found in perltidyrc files. Set to "false"
+  to reverse this behavior and let perltidyrc files win.
+
+Please refer to:
+
+    https://github.com/rbo/st2-perltidy
+
+for full documentation.
