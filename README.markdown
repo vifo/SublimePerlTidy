@@ -1,6 +1,6 @@
 # PerlTidy for Sublime Text 2
 
-PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/), which integrates [perltidy](http://perltidy.sourceforge.net/) into ST2. It indents and reformats Perl scripts to make them easier to read.
+PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/), which integrates [perltidy](http://perltidy.sourceforge.net/) into ST2. It indents and reformats Perl source code to make it easier to read.
 
 ## Installation
 
@@ -26,52 +26,43 @@ The *Packages* directory is located at:
 
 * Windows:
 
-    %APPDATA%/Sublime Text 2/Packages/
+    %APPDATA%\Sublime Text 2\Packages\
 
 ## Configuration
 
-### Key bindings
+### perltidy locations
 
-Defaults to `Ctrl+Shift+t` for Windows/Linux and `Super+Shift+t` for OS X, since `Ctrl+t` is used by some other plugins. Change in `Preferences->Key Bindings->Default` or `Preferences->Key Bindings - User`.
+PerlTidy will try to locate perltidy by:
 
-### Settings
+1. Checking the user setting "perltidy_cmd" for a (valid) user supplied perltidy location.
 
-Open `Preferences->Settings - Default` or `Preferences->Settings - User`. Add the following lines:
+2. Searching for "perltidy" ("perltidy.bat" on Windows) within directories specified in environment variable *PATH*.
 
-    // Specify full path to perltidy and optionally the Perl interpreter. If
-    // not specified, will search PATH for perltidy. Please note, that on
-    // Win32, you must either specify either the full path to the batch
-    // wrapper "perltidy.bat"  (NOT "perltidy"), or specify the Perl
-    // interpreter path AND the path to the "raw" "perltidy" file. The latter
-    // is preferred, since we don't really need the batch wrapper at all.
-    // Settings below are known to work with a default Strawberry Perl
-    // installation.
-    //"perltidy_cmd": "/opt/perl/bin/perltidy"
-    //"perltidy_cmd": [ "C:\\strawberry\\perl\\bin\\perl.exe", "C:\\strawberry\\perl\\site\\bin\\perltidy" ]
-    //"perltidy_cmd": [ "C:\\strawberry\\perl\\site\\bin\\perltidy.bat" ]   // possible, but not needed
+3. Searching for perltidy in platform specific default locations. These are:
 
-    // Specify what perltidyrc files to search for within current project.
-    // Note, that only the first matching perltidyrc within the project will
-    // be used. Absolute paths may also be used.
-    //"perltidy_rc_paths": [ ".perltidyrc", "perltidyrc" ]
+* On Windows (in given order):
 
-    // Specify perltidy options. Defaults to
-    // [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
-    // if not given.
-    //"perltidy_options": [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+  Default [Strawberry Perl](http://strawberryperl.com/) installation location *C:\Strawberry*, i.e.:
 
-    // Log level for perltidy operations. Set to 1 to enable informational
-    // messages and to 2 for full debugging. Defaults to 0, so only warnings
-    // and errors will be displayed on the console.
-    //"perltidy_log_level": 0
+  ```"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]```
 
-    // If, for some reason, you'd like to disable PerlTidy entirely, set
-    // "perltidy_enabled" to false. Defaults to true.
-    //"perltidy_enabled": true
+  Default [ActivePerl](http://www.activestate.com/activeperl) installation location *C:\Perl*, i.e.:
+
+  ```"perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]```
+
+  Default [Cygwin](http://cygwin.com/) installation location *C:\cygwin*, i.e.:
+
+  ```"perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]```
+
+* On Linux and OSX:
+
+  */usr/bin/perltidy*, */usr/local/bin/perltidy* (which will most likely be in your *PATH* anyway).
+
+Let PerlTidy try to locate perltidy first. If this does not work, adjust user setting "perltidy_cmd" as needed.
 
 ### Default perltidy options
 
-The default perltidy options are set as follows (you may override them by setting "perltidy_options" in your user preferences). Please refer to the offical [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
+The default perltidy options are set as follows (you may override them by changing user setting "perltidy_options" in your preferences). Please refer to the official [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
 
 * -sbl
 
@@ -105,9 +96,76 @@ The default perltidy options are set as follows (you may override them by settin
 
   Errors go to STDERR. **Please ensure, that you include this settings, when changing default options.** Otherwise, perltidy error messages won't appear in a separate window. Details: [perltidy Documentation | Standard Error Output](http://perltidy.sourceforge.net/perltidy.html#se_standard_error_output).
 
+### Key bindings
+
+Defaults to `Control+Shift+t` for Windows/Linux and `Command+Shift+t` for OS X, since `Control+t` is used by some other plugins. Change in `Preferences->Key Bindings - User` by adding and adjusting following lines:
+
+    // PerlTidy key bindings
+    {
+        "keys": ["ctrl+shift+t"],
+        "command": "perl_tidy",
+        "context": [ { "key": "selector", "operator": "equal", "operand": "source.perl", "match_all": true } ]
+    }
+
+### Settings
+
+If you'd like to override specific settings, open `Preferences->Settings - User` and add the following lines:
+
+    // Specify full path to perltidy and optionally the Perl interpreter. If not
+    // specified, will search PATH for perltidy and fall back to platform default
+    // locations.
+    //
+    // Please note, that with Strawberry Perl/ActivePerl on Windows, you have to
+    // either specify the full path to the Perl interpreter AND the perltidy file
+    // (NOT "perltidy.bat"), OR the full path to the batch wrapper file
+    // "perltidy.bat". The former is preferred, we don't need the batch wrapper.
+    //
+    // Windows/Strawberry Perl/ActivePerl:
+    //"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]
+    //"perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]
+    //
+    // Windows/Cygwin (without/with Cygwin wrapper, see README/Troubleshooting)
+    //"perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]
+    //"perltidy_cmd": [ "C:\\cygwin\\bin\\sh.exe", "/usr/local/bin/perltidy" ]
+    //
+    // Linux/OSX with non-standard location or explicit Perl interpreter:
+    //"perltidy_cmd": "/opt/perl/bin/perltidy"
+    //"perltidy_cmd": [ "/opt/perl-5.16.2/bin/perl", "/opt/perl/bin/perltidy" ]
+
+    // Specify possible perltidyrc files to search for within current project. The
+    // first matching perltidyrc will be used. Absolute paths may also be used, if
+    // you have a global perltidyrc. Defaults to [ ".perltidyrc", "perltidyrc" ].
+    //"perltidy_rc_paths": [ ".perltidyrc", "perltidyrc" ]
+    //"perltidy_rc_paths": [ "C:\\Users\\USERNAME\\AppData\\Roaming\\perltidyrc" ]
+
+    // Specify perltidy options. Defaults to: [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+    //"perltidy_options": [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+
+    // Log level for perltidy operations. Set to 1 to enable informational
+    // messages and to 2 for full debugging. Defaults to 0, so only warnings and
+    // errors will be displayed on the console.
+    //"perltidy_log_level": 0
+
+    // If, for some reason, you'd like to disable PerlTidy entirely, set
+    // "perltidy_enabled" to false. Defaults to true.
+    //"perltidy_enabled": true
+
+You may override any of these settings per project, by adding a section named "settings" with overridden settings to your project file:
+
+    {
+        "folders": [
+            {
+                "path": "..."
+            }
+        ],
+        "settings": {
+            "perltidy_log_level": 2
+        }
+    }
+
 ## Troubleshooting
 
-During normal operation, PerlTidy will emit warnings and errors to the Sublime Text 2 console (open with ``Ctrl+` ``). In order to enable additional diagnostic messages, adjust user setting "perltidy_log_level" as follows:
+During normal operation, PerlTidy will emit warnings and errors to the Sublime Text 2 console (open with ``Control+` `` or select `View->Show Console` from menu). In order to enable additional diagnostic messages, adjust user setting "perltidy_log_level" as follows:
 
 * 0 == Warnings and error messages only. This is the default.
 
@@ -115,32 +173,101 @@ During normal operation, PerlTidy will emit warnings and errors to the Sublime T
 
 * 2 == Full debugging. In addition to the above, print where PerlTidy searches for perltidy and/or perltidyrc.
 
-### Common Errors
+### Common Pitfalls
 
 #### Windows Error 193
 
-You are running on Win32, and have set a custom perltidy path via user setting "perltidy_cmd". While trying to run, PerlTidy bails out with the following error message on the ST2 console:
+You are running Strawberry Perl/ActivePerl on Windows, and have set a custom path to perltidy via user setting "perltidy_cmd". While trying to run, PerlTidy bails out with the following error message on the ST2 console:
 
     PerlTidy: Unable to run perltidy: "C:\Strawberry\perl\site\bin\perltidy" ...
     PerlTidy: OS error was: WindowsError(193, '...')
     PerlTidy: Maybe you have specified the path to "perltidy" instead of "perltidy.bat" in your "perltidy_cmd"?
 
-You have specified the path to the *perltidy* Perl file, instead of the batch wrapper *perltidy.bat*. Win32 is unable to execute this file directly. Yes, running this file in *cmd.exe* will work, but only due to the way, how cmd.exe handles files without an extension: it will add extensions in environment variable *PATHEXT*, eventually finally find the *perltidy.bat* and run it.
+You have specified the path to the raw Perl "perltidy" file (without extension), instead of the batch wrapper file "perltidy.bat". Windows is unable to execute the former file directly. Yes, typing "perltidy" in *cmd.exe* will work, but only due to the way, how *cmd.exe* handles files without an extension: it will try extensions specified in environment variable *PATHEXT*, eventually find the file "perltidy.bat" and run it.
 
-TL/DR: Assuming you are running a vanilla installation of [Strawberry Perl](http://strawberryperl.com/): adjust "perltidy_cmd" user setting to either:
+TL/DR: Assuming you are running a vanilla Strawberry Perl/ActivePerl installation: adjust user setting "perltidy_cmd" to one of the following:
 
-    "perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]
+    "perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]    # for Strawberry Perl
+    "perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]                            # for ActivePerl
 
-or to the following, if you really need to use the batch wrapper for some (non-obvious) reason:
+or, if you really need to use the batch wrapper for some (non-obvious) reasons, to:
 
-    "perltidy_cmd": "C:\\Strawberry\\perl\\site\\bin\\perltidy.cmd"
+    "perltidy_cmd": "C:\\Strawberry\\perl\\site\\bin\\perltidy.bat"       # for Strawberry Perl
+    "perltidy_cmd": "C:\\Perl\\site\\bin\\perltidy.bat"                   # for ActivePerl
+
+or just let PerlTidy figure out where perltidy is located by *not setting* "perltidy_cmd" at all.
+
+#### Cygwin locale settings and path style warnings
+
+You are running Cygwin on Windows, PerlTidy did either auto detect your Cygwin installation, or you have set your "perltidy_cmd" to:
+
+    "perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]
+
+Running PerlTidy does not indent the source code. Instead, you get the following PerlTidy error output:
+
+    perl: warning: Setting locale failed.
+    perl: warning: Please check that your locale settings:
+      LC_ALL = (unset),
+      LANG = "DE"
+        are supported and installed on your system.
+    perl: warning: Falling back to the standard locale ("C").
+
+In addition, you might also encounter:
+
+    cygwin warning:
+      MS-DOS style path detected: c:\users\USERNAME\appdata\local\temp\tmp0rsc41
+      Preferred POSIX equivalent is: /cygdrive/c/users/USERNAME/appdata/local/temp/tmp0rsc41
+      CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+      Consult the user's guide for more details about POSIX paths:
+        http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+
+These warnings are interpreted as errors by PerlTidy. In order to get rid of them, please use the shell wrapper script "helpers/perltidy_cygwin_wrapper.sh" contained in the PerlTidy package. Adjust your "perltidy_cmd" to:
+
+    "perltidy_cmd": [ "C:\\cygwin\\bin\\sh.exe", "/cygdrive/c/Users/USERNAME/AppData/Roaming/Sublime Text 2/Packages/st2-perltidy/helpers/perltidy_cygwin_wrapper.sh" ]
+
+This will set a default locale for Perl under Cygwin as well as disable the MS-DOS style path warnings when running perltidy. Please note, that the second element of "perltidy_cmd" must be the path of the wrapper shell script in Cygwin path notation. Adjust as required.
+
+## Reporting bugs
+
+In order to make bug hunting easier, please ensure, that you always run the *latest* version of PerlTidy. Apart from this, please ensure, that you've set PerlTidy log level to maximum (`"perltidy_log_level": 2` in user settings), in order to get all debugging information possible. Also please include the following information, when submitting an issue:
+
+* Operating system name (i.e. "Windows XP SP3", **not** "Windows")
+
+* Operating system architecture (i.e. 32-bit, 64-bit)
+
+* Sublime Text 2 build number (open `Help->About`)
+
+* Output from Sublime Text 2 console
+
+To gather this information quickly, open ST2 console, type in the following Python code as-is (in one line) and include its output in your issue:
+
+```
+import platform; import sublime; import datetime; print '-' * 78; print "Date/time: " + datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S +0000'); print "ST2 version: " + sublime.version(); print "ST2 platform: " + sublime.platform(); print "CPU architecture: " + sublime.arch(); print "OS info: " + repr(platform.platform()); print '-' * 78
+```
 
 ## TODOs
 
-* Implement automatic tidying upon save.
-
+* Implement automatic tidying of Perl files upon save. Until then, [SublimeOnSaveBuild](https://github.com/alexnj/SublimeOnSaveBuild) might be an option to achieve this.
 
 ## Changes
+
+### v0.1.1 - 2012-12-06 14:30:00 +0100
+
+Preliminary support for Cygwin added. Settings now reloaded on each PerlTidy run.
+
+* Settings are now reloaded on each run of PerlTidy. (vifo)
+* Now using sublime.platform() instead of os.name for getting platform name.
+* Now catching EnvironmentError exceptions instead of OSError in
+  tidy_region(). This will also catch IOError exceptions, which previously
+  were not catched at all. (vifo)
+* Removed accessors: get_perltidy_options(), get_perltidy_rc_paths().
+* Added simple shell wrapper for Cygwin installations under
+  "helpers/perltidy_cygwin_wrapper.sh". (vifo)
+* Added messages to be displayed by Package Control on installation and
+  upgrades in "messages/". Added "messages.json" to link the messages. (vifo)
+* Added automatic detection of pelrtidy in default installations of Strawberry
+  Perl/ActivePerl/Cygwin. (vifo)
+* Updated documentation. (vifo)
 
 ### v0.1.0 - 2012-11-26 19:20:35 +0100
 
@@ -159,7 +286,7 @@ or to the following, if you really need to use the batch wrapper for some (non-o
 * Default settings now in DEFAULT_SETTINGS. (vifo)
 * User will now get a warning, if the command provided in "perltidy_cmd" is
   invalid. (vifo)
-* When running on Win32, will now search for "perltidy.bat" instead of
+* When running on Windows, will now search for "perltidy.bat" instead of
   "perltidy", if user did not specify "perltidy_cmd". (vifo)
 * Changed subprocess handling. Now using Shell=False, when running commands,
   so we won't have to escape arguments, before passing them to perltidy. This
@@ -184,7 +311,7 @@ or to the following, if you really need to use the batch wrapper for some (non-o
   specifying where the Perl interpreter and where PerlTidy is separately, i.e.
   [ "C:\\strawberry\\perl\\bin\\perl.exe", "C:\\strawberry\\perl\\site\\bin\\perltidy" ]
   instead of using wrapper "C:\\strawberry\\perl\\site\\bin\\perltidy.bat".
-  Useful on Win32 systems, or where the shebang in perltidy specifies a wrong
+  Useful on Windows systems, or where the shebang in perltidy specifies a wrong
   Perl interpreter. (vifo)
 * "perltidy_rc_paths" now allows the user to specify possible perltidy.rc
   locations. Full file paths are also allowed and will be handled properly.
@@ -200,6 +327,3 @@ or to the following, if you really need to use the batch wrapper for some (non-o
 ### v0.0.1 - 2012-07-25 22:00:00 +0100
 
 * Initial version
-
-
-

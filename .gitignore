@@ -3,3 +3,4 @@
 test*.pl
 COMMIT
 perltidyrc
+misc/
