@@ -124,9 +124,8 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     //"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]
     //"perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]
     //
-    // Windows/Cygwin (without/with Cygwin wrapper, see README/Troubleshooting)
+    // Windows/Cygwin:
     //"perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]
-    //"perltidy_cmd": [ "C:\\cygwin\\bin\\sh.exe", "/usr/local/bin/perltidy" ]
     //
     // Linux/OSX with non-standard location or explicit Perl interpreter:
     //"perltidy_cmd": "/opt/perl/bin/perltidy"
@@ -197,36 +196,6 @@ or, if you really need to use the batch wrapper for some (non-obvious) reasons, 
 
 or just let PerlTidy figure out where perltidy is located by *not setting* "perltidy_cmd" at all.
 
-#### Cygwin locale settings and path style warnings
-
-You are running Cygwin on Windows, PerlTidy did either auto detect your Cygwin installation, or you have set your "perltidy_cmd" to:
-
-    "perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]
-
-Running PerlTidy does not indent the source code. Instead, you get the following PerlTidy error output:
-
-    perl: warning: Setting locale failed.
-    perl: warning: Please check that your locale settings:
-      LC_ALL = (unset),
-      LANG = "DE"
-        are supported and installed on your system.
-    perl: warning: Falling back to the standard locale ("C").
-
-In addition, you might also encounter:
-
-    cygwin warning:
-      MS-DOS style path detected: c:\users\USERNAME\appdata\local\temp\tmp0rsc41
-      Preferred POSIX equivalent is: /cygdrive/c/users/USERNAME/appdata/local/temp/tmp0rsc41
-      CYGWIN environment variable option "nodosfilewarning" turns off this warning.
-      Consult the user's guide for more details about POSIX paths:
-        http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
-
-These warnings are interpreted as errors by PerlTidy. In order to get rid of them, please use the shell wrapper script "helpers/perltidy_cygwin_wrapper.sh" contained in the PerlTidy package. Adjust your "perltidy_cmd" to:
-
-    "perltidy_cmd": [ "C:\\cygwin\\bin\\sh.exe", "/cygdrive/c/Users/USERNAME/AppData/Roaming/Sublime Text 2/Packages/st2-perltidy/helpers/perltidy_cygwin_wrapper.sh" ]
-
-This will set a default locale for Perl under Cygwin as well as disable the MS-DOS style path warnings when running perltidy. Please note, that the second element of "perltidy_cmd" must be the path of the wrapper shell script in Cygwin path notation. Adjust as required.
-
 ## Reporting bugs
 
 In order to make bug hunting easier, please ensure, that you always run the *latest* version of PerlTidy. Apart from this, please ensure, that you've set PerlTidy log level to maximum (`"perltidy_log_level": 2` in user settings), in order to get all debugging information possible. Also please include the following information, when submitting an issue:
@@ -249,37 +218,43 @@ import platform; import sublime; import datetime; print '-' * 78; print "Date/ti
 
 * Implement automatic tidying of Perl files upon save. Until then, [SublimeOnSaveBuild](https://github.com/alexnj/SublimeOnSaveBuild) might be an option to achieve this.
 
+* Add user setting to control precedence of perltidy options over perltidyrc contents.
+
 ## Changes
 
-### v0.1.1 - 2012-12-06 14:30:00 +0100
+### v0.1.1 - 2012-12-19 20:15:00 +0100
 
-Preliminary support for Cygwin added. Settings now reloaded on each PerlTidy run.
+Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
 
+* Using Perl under Cygwin is now supported. PerlTidy will set required
+  environment variables, if running on Windows, so we won't get any warnings
+  from Cygwin/Perl (i.e. LANG="C" and CYGWIN+="nodosfilewarning"). (vifo)
 * Settings are now reloaded on each run of PerlTidy. (vifo)
+* Refactored most of the code and moved it to perltidy/helpers.py, so we can
+  test it, without mocking too much. (vifo)
 * Now using sublime.platform() instead of os.name for getting platform name.
+  (vifo)
 * Now catching EnvironmentError exceptions instead of OSError in
   tidy_region(). This will also catch IOError exceptions, which previously
   were not catched at all. (vifo)
-* Removed accessors: get_perltidy_options(), get_perltidy_rc_paths().
-* Added simple shell wrapper for Cygwin installations under
-  "helpers/perltidy_cygwin_wrapper.sh". (vifo)
 * Added messages to be displayed by Package Control on installation and
   upgrades in "messages/". Added "messages.json" to link the messages. (vifo)
-* Added automatic detection of pelrtidy in default installations of Strawberry
-  Perl/ActivePerl/Cygwin. (vifo)
-* Updated documentation. (vifo)
+* Added automatic detection of perltidy in default installations of Strawberry
+  Perl/ActivePerl/Cygwin under Windows. (vifo)
+* Removed accessors: get_perltidy_options(), get_perltidy_rc_paths(). (vifo)
+* Improved documentation. (vifo)
 
 ### v0.1.0 - 2012-11-26 19:20:35 +0100
 
 * WindowsError 6 "Invalid handle" occured, while running perltidy via
   subprocess and using temporary files for I/O with perltidy. The error
-  occured, because we were not passing PIPEs for STDIN/STDOUT to
-  subprocess. This seems to occur on Windows XP only and is somehow
-  related to http://bugs.python.org/issue3905. Fixed by always
-  providing subprocess.PIPE for all three handles. (vifo)
-* Exception handling for running perltidy added. Errors will be checked
-  for some common errors and additional hints will be printed on the
-  ST2 console. (vifo)
+  occured, because we were not passing PIPEs for STDIN/STDOUT to subprocess.
+  This seems to occur on Windows XP only and is somehow related to
+  http://bugs.python.org/issue3905. Fixed by always providing subprocess.PIPE
+  for all three handles. (vifo)
+* Exception handling for running perltidy added. Errors will be checked for
+  some common errors and additional hints will be printed on the ST2 console.
+  (vifo)
 * Restructured code and moved perltidy command validation to
   is_valid_perltidy_cmd(). (vifo)
 * get_perltidy_rc_path() renamed to find_perltidyrc_in_project(). (vifo)
@@ -288,22 +263,22 @@ Preliminary support for Cygwin added. Settings now reloaded on each PerlTidy run
   invalid. (vifo)
 * When running on Windows, will now search for "perltidy.bat" instead of
   "perltidy", if user did not specify "perltidy_cmd". (vifo)
-* Changed subprocess handling. Now using Shell=False, when running commands,
-  so we won't have to escape arguments, before passing them to perltidy. This
-  will most likely fix issue #3, though I am not able to test it. (vifo)
+* Changed subprocess handling. Now using Shell=False, when running commands, so
+  we won't have to escape arguments, before passing them to perltidy. This will
+  most likely fix issue #3, though I am not able to test it. (vifo)
 * Changed passing input to perltidy/reading output from perltidy. If the data
-  to be tidied contains any non-ASCII characters, temporary files will be
-  used to pass/read data. This allows us for non-ASCII data to be handled
-  correctly. Fixes: issue #4. (vifo)
+  to be tidied contains any non-ASCII characters, temporary files will be used
+  to pass/read data. This allows us for non-ASCII data to be handled correctly.
+  Fixes: issue #4. (vifo)
 * Added debugging messages. Verbosity level can be set by user in
   "perltidy_log_level". (vifo)
 * Reformatted JSON sublime-keymap files. (vifo)
-* Fixed #7. Apparently, the Sublime Text 2 API changed and method names are
-  now underscored in Sublime Text 2 API. This broke opening of the error output
-  view. Not sure, whether compatibiity with earlier ST2 APIs might be an issue? 
+* Fixed #7. Apparently, the Sublime Text 2 API changed and method names are now
+  underscored in Sublime Text 2 API. This broke opening of the error output
+  view. Not sure, whether compatibiity with earlier ST2 APIs might be an issue?
   (vifo)
-* Removed '-sbdl' from default PerlTidy options and added '-sbl'. '-sbdl' is
-  an unknown option. (vifo)
+* Removed '-sbdl' from default PerlTidy options and added '-sbl'. '-sbdl' is an
+  unknown option. (vifo)
 * All configuration settings are now user configurable, with sane fallback
   values. In addition to "perltidy_cmd", now also "perltidy_options" and
   "perltidy_default_rc_paths" may be specified. (vifo)
@@ -317,13 +292,14 @@ Preliminary support for Cygwin added. Settings now reloaded on each PerlTidy run
   locations. Full file paths are also allowed and will be handled properly.
   Note that now only the first perltidy.rc found in project will be used.  This
   prevents error messages from perltidy. (vifo)
-* Output from PerlTidy is now only inserted, if no error occured while
-  running PerlTidy. (vifo)
-* Cursor repositioning after running PerlTidy is done now only, if no
-  error occured running PerlTidy. (vifo)
+* Output from PerlTidy is now only inserted, if no error occured while running
+  PerlTidy. (vifo)
+* Cursor repositioning after running PerlTidy is done now only, if no error
+  occured running PerlTidy. (vifo)
 * Improve the documentation. (vifo)
 * Fix error in commands file (kassi)
 
 ### v0.0.1 - 2012-07-25 22:00:00 +0100
 
 * Initial version
+
