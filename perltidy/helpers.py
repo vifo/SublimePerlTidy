@@ -290,7 +290,7 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
         if not error_output:
             success = True
         else:
-            error_output = error_output.decode('cp850')
+            error_output = error_output.decode('ascii', 'replace')
 
     # Handle OS errors. Check, if we can give the user some hints.
     except (WindowsError, EnvironmentError) as e:

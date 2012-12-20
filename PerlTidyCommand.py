@@ -9,6 +9,7 @@ DEFAULT_SETTINGS = {
     'perltidy_enabled': True,
     'perltidy_log_level': 0,
     'perltidy_options': ['-sbl', '-bbt=1', '-pt=2', '-nbbc', '-l=100', '-ole=unix', '-w', '-se'],
+    'perltidy_options_take_precedence': True,
     'perltidy_rc_paths': ['.perltidyrc', 'perltidyrc'],
 }
 
@@ -71,6 +72,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
             self._perltidy_log_level = settings.get('perltidy_log_level', DEFAULT_SETTINGS['perltidy_log_level'])
         if reload or self._perltidy_options is None:
             self._perltidy_options = settings.get('perltidy_options', DEFAULT_SETTINGS['perltidy_options'])
+        if reload or self._perltidy_options_take_precedence is None:
+            self._perltidy_options_take_precedence = settings.get('perltidy_options_take_precedence', DEFAULT_SETTINGS['perltidy_options_take_precedence'])
         if reload or self._perltidy_rc_paths is None:
             self._perltidy_rc_paths = settings.get('perltidy_rc_paths', DEFAULT_SETTINGS['perltidy_rc_paths'])
         if reload and self._perltidy_cmd is not None:
@@ -117,23 +120,31 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                         self.view.sel().subtract(self.view.sel()[1])
                     self.view.show_at_center(self.view.sel()[0].begin())
 
-    # Tidy given region; returns True on success or False on perltidy runtime
-    # error.
-    def tidy_region(self, edit, region):
-
-        # Build command.
+    # Build perltidy command to be run, including any options.
+    def build_perltidy_cmd(self):
         cmd = []
         cmd.extend(self._perltidy_cmd)
-        cmd.extend(self._perltidy_options)
+
+        if not self._perltidy_options_take_precedence:
+            cmd.extend(self._perltidy_options)
 
         # Check, if we have a perltidyrc in the current project and append to
-        # command. TODO: Order should be user configurable.
+        # command.
         perltidyrc_path = find_perltidyrc_in_project(directories=self.view.window().folders(), perltidyrc_paths=self._perltidy_rc_paths, logger=self)
         if perltidyrc_path is not None:
             cmd.append('-pro=' + perltidyrc_path)
 
+        if self._perltidy_options_take_precedence:
+            cmd.extend(self._perltidy_options)
+
+        return cmd
+
+    # Tidy given region; returns True on success or False on perltidy runtime
+    # error.
+    def tidy_region(self, edit, region):
+
         # Run perltidy.
-        success, output, error_output, error_hints = run_perltidy(cmd=cmd, input=self.view.substr(region), logger=self)
+        success, output, error_output, error_hints = run_perltidy(cmd=self.build_perltidy_cmd(), input=self.view.substr(region), logger=self)
 
         if success:
             self.view.replace(edit, region, output)

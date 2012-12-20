@@ -109,7 +109,7 @@ Defaults to `Control+Shift+t` for Windows/Linux and `Command+Shift+t` for OS X, 
 
 ### Settings
 
-If you'd like to override specific settings, open `Preferences->Settings - User` and add the following lines:
+If you'd like to override specific settings, open `Preferences->Settings - User` and add/adjust the following lines:
 
     // Specify full path to perltidy and optionally the Perl interpreter. If not
     // specified, will search PATH for perltidy and fall back to platform default
@@ -129,7 +129,7 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     //
     // Linux/OSX with non-standard location or explicit Perl interpreter:
     //"perltidy_cmd": "/opt/perl/bin/perltidy"
-    //"perltidy_cmd": [ "/opt/perl-5.16.2/bin/perl", "/opt/perl/bin/perltidy" ]
+    //"perltidy_cmd": [ "/opt/perl-5.16.2/bin/perl", "/opt/perl-5.10.1/site/bin/perltidy" ]
 
     // Specify possible perltidyrc files to search for within current project. The
     // first matching perltidyrc will be used. Absolute paths may also be used, if
@@ -139,6 +139,11 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
 
     // Specify perltidy options. Defaults to: [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
     //"perltidy_options": [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+
+    // Specify, whether perltidy options given in "perltidy_options" take
+    // precedence over options found in perltidyrc files. Defaults to "true".
+    // Adjust to "false" to reverse this order.
+    //"perltidy_options_take_precedence": true
 
     // Log level for perltidy operations. Set to 1 to enable informational
     // messages and to 2 for full debugging. Defaults to 0, so only warnings and
@@ -158,7 +163,8 @@ You may override any of these settings per project, by adding a section named "s
             }
         ],
         "settings": {
-            "perltidy_log_level": 2
+            "perltidy_log_level": 2,
+            "perltidy_options": [ "-l=120", "-ole=unix", "-w", "-se" ]
         }
     }
 
@@ -218,17 +224,20 @@ import platform; import sublime; import datetime; print '-' * 78; print "Date/ti
 
 * Implement automatic tidying of Perl files upon save. Until then, [SublimeOnSaveBuild](https://github.com/alexnj/SublimeOnSaveBuild) might be an option to achieve this.
 
-* Add user setting to control precedence of perltidy options over perltidyrc contents.
-
 ## Changes
 
-### v0.1.1 - 2012-12-19 20:15:00 +0100
+### v0.2.0 2012-12-20 09:45:00 +0100
 
 Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
 
-* Using Perl under Cygwin is now supported. PerlTidy will set required
+* Added automatic detection of perltidy in default installations of Strawberry
+  Perl/ActivePerl/Cygwin under Windows. (vifo)
+* Running Perl/perltidy under Cygwin is now supported. PerlTidy will set required
   environment variables, if running on Windows, so we won't get any warnings
   from Cygwin/Perl (i.e. LANG="C" and CYGWIN+="nodosfilewarning"). (vifo)
+* User setting "perltidy_options_take_precedence" added. If set to "true",
+  which is the default, options from user setting "perltidy_options" will
+  take precedence over options found in perltidyrc files. (vifo).
 * Settings are now reloaded on each run of PerlTidy. (vifo)
 * Refactored most of the code and moved it to perltidy/helpers.py, so we can
   test it, without mocking too much. (vifo)
@@ -239,8 +248,6 @@ Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
   were not catched at all. (vifo)
 * Added messages to be displayed by Package Control on installation and
   upgrades in "messages/". Added "messages.json" to link the messages. (vifo)
-* Added automatic detection of perltidy in default installations of Strawberry
-  Perl/ActivePerl/Cygwin under Windows. (vifo)
 * Removed accessors: get_perltidy_options(), get_perltidy_rc_paths(). (vifo)
 * Improved documentation. (vifo)
 
@@ -302,4 +309,3 @@ Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
 ### v0.0.1 - 2012-07-25 22:00:00 +0100
 
 * Initial version
-

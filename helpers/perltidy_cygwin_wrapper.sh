@@ -2,7 +2,7 @@
 
 # Sublime Text 2 PerlTidy Cygwin wrapper.
 #
-# Use, when running under Win32 with Cygwin and getting warnings from
+# Use, when running under Windows with Cygwin and getting warnings from
 # Perl/Cygwin. Sets locale, so Perl does not complain and lets Cygwin accept
 # the MS-DOS file paths of temporary files.
 
