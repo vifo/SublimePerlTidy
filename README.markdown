@@ -226,6 +226,10 @@ import platform; import sublime; import datetime; print '-' * 78; print "Date/ti
 
 ## Changes
 
+### v0.2.1 2013-04-13 14:38:00 +0200
+
+Version number bumped. Latest package was missing in package repository.
+
 ### v0.2.0 2012-12-20 09:45:00 +0100
 
 Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
