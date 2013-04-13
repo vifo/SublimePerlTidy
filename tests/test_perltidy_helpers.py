@@ -16,9 +16,13 @@ PERLTIDY_INPUTS = {
         'input': u'#!/usr/bin/env perl\n  use strict;',
         'output': u'#!/usr/bin/env perl\nuse strict;\n',
     },
-    'utf8': {
+    'utf8_1': {
         'input': u'#!/usr/bin/env perl\nuse strict;\n  use utf8; $foo = "äöüÄÖÜ";',
         'output': u'#!/usr/bin/env perl\nuse strict;\nuse utf8;\n$foo = "äöüÄÖÜ";\n',
+    },
+    'utf8_2': {
+        'input': u"$row->{tipo_doc_id_fmt}  =  '<não definido>' unless $row->{tipo_doc_id_fmt};\n",
+        'output': u"$row->{tipo_doc_id_fmt} = '<não definido>' unless $row->{tipo_doc_id_fmt};\n",
     },
 }
 
@@ -67,7 +71,7 @@ class PerlTidyInterpreterTestCase(PerlTidyTestCase):
 
     def test_run_perltidy(self):
         self.skip_if_have_reason()
-        for key in ['ascii', 'utf8']:
+        for key in ['ascii', 'utf8_1', 'utf8_2']:
             success, output, error_output, error_hints = run_perltidy(cmd=self.perltidy_cmd, input=PERLTIDY_INPUTS[key]['input'], logger=self.logger)
             assert_equal(success, True)
             assert_equal(output, PERLTIDY_INPUTS[key]['output'])

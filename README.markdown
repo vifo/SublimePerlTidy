@@ -145,6 +145,13 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     // Adjust to "false" to reverse this order.
     //"perltidy_options_take_precedence": true
 
+    // Specify, whether PerlTidy should always use temporary files, instead
+    // of process pipes to filter code. Using temporary files is slower, but
+    // fails, if the source code contains non ASCII characters. Set this option
+    // to true, to force temporary file usage, or to 'auto', to let PerlTidy
+    // decide. Defaults to 'auto'.
+    //"perltidy_use_temporary_files": 'auto'
+
     // Log level for perltidy operations. Set to 1 to enable informational
     // messages and to 2 for full debugging. Defaults to 0, so only warnings and
     // errors will be displayed on the console.

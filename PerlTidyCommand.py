@@ -11,15 +11,17 @@ DEFAULT_SETTINGS = {
     'perltidy_options': ['-sbl', '-bbt=1', '-pt=2', '-nbbc', '-l=100', '-ole=unix', '-w', '-se'],
     'perltidy_options_take_precedence': True,
     'perltidy_rc_paths': ['.perltidyrc', 'perltidyrc'],
+    'perltidy_use_temporary_files': 'auto',
 }
 
 
 class PerlTidyCommand(sublime_plugin.TextCommand):
 
-    _perltidy_cmd = None
-    _perltidy_log_level = None
-    _perltidy_options = None
-    _perltidy_rc_paths = None
+    _perltidy_cmd                 = None
+    _perltidy_log_level           = None
+    _perltidy_options             = None
+    _perltidy_rc_paths            = None
+    _perltidy_use_temporary_files = None
 
     # Try to locate perltidy and set self._perltidy_cmd.
     def find_perltidy(self):
@@ -70,6 +72,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
         if reload or self._perltidy_log_level is None:
             self._perltidy_log_level = settings.get('perltidy_log_level', DEFAULT_SETTINGS['perltidy_log_level'])
+        if reload or self._perltidy_use_temporary_files is None:
+            self._perltidy_use_temporary_files = settings.get('perltidy_use_temporary_files', DEFAULT_SETTINGS['perltidy_use_temporary_files'])
         if reload or self._perltidy_options is None:
             self._perltidy_options = settings.get('perltidy_options', DEFAULT_SETTINGS['perltidy_options'])
         if reload or self._perltidy_options_take_precedence is None:
@@ -144,7 +148,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
     def tidy_region(self, edit, region):
 
         # Run perltidy.
-        success, output, error_output, error_hints = run_perltidy(cmd=self.build_perltidy_cmd(), input=self.view.substr(region), logger=self)
+        success, output, error_output, error_hints = run_perltidy(cmd=self.build_perltidy_cmd(), input=self.view.substr(region), logger=self, use_temporary_files=self._perltidy_use_temporary_files)
 
         if success:
             self.view.replace(edit, region, output)

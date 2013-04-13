@@ -185,7 +185,7 @@ def pp(string):
 
 # Tidy given region; returns True on success or False on perltidy runtime
 # error.
-def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
+def run_perltidy(cmd, input, use_temporary_files='auto', logger=PerlTidyNullLogger()):
     """Run perltidy using given "cmd" and "input".
 
     Runs perltidy specified by "cmd" and passes data given in "input" to
@@ -226,15 +226,20 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
     # prepare temporary files for input and output with UTF-8 encoding, and
     # spool the input to file. Adjust perltidy call, so data will be read and
     # written to temporary files.
-    use_temporary_files = False
 
     cmd_final = []
     cmd_final.extend(cmd)
 
-    try:
-        input.decode('ascii')
-    except UnicodeEncodeError:
-        use_temporary_files = True
+    use_temporary_files_orig = use_temporary_files
+    if use_temporary_files == 'auto':
+        use_temporary_files = False
+
+        try:
+            input.decode('ascii')
+        except UnicodeEncodeError:
+            use_temporary_files = True
+
+    logger.log(2, 'Using temporary files for I/O: {0}/{1}'.format(use_temporary_files_orig, use_temporary_files))
 
     if use_temporary_files:
         # Create temporary files for input/output and reopen them with
