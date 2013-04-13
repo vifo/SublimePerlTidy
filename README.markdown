@@ -226,21 +226,23 @@ import platform; import sublime; import datetime; print '-' * 78; print "Date/ti
 
 ## Changes
 
+### v0.2.1 2013-04-13 14:38:00 +0200
+
+Version number bumped. Latest package was missing in package repository.
+
 ### v0.2.0 2012-12-20 09:45:00 +0100
 
 Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
 
-* Added automatic detection of perltidy in default installations of Strawberry
-  Perl/ActivePerl/Cygwin under Windows. (vifo)
+* User setting "perltidy_options_take_precedence" added. If set to "true",
+  which is the default, options from user setting "perltidy_options" will take
+  precedence over options found in perltidyrc files. (vifo)
 * Running Perl/perltidy under Cygwin is now supported. PerlTidy will set required
   environment variables, if running on Windows, so we won't get any warnings
   from Cygwin/Perl (i.e. LANG="C" and CYGWIN+="nodosfilewarning"). (vifo)
-* User setting "perltidy_options_take_precedence" added. If set to "true",
-  which is the default, options from user setting "perltidy_options" will
-  take precedence over options found in perltidyrc files. (vifo).
+* Added automatic detection of perltidy in default installations of Strawberry
+  Perl/ActivePerl/Cygwin on Windows. (vifo)
 * Settings are now reloaded on each run of PerlTidy. (vifo)
-* Refactored most of the code and moved it to perltidy/helpers.py, so we can
-  test it, without mocking too much. (vifo)
 * Now using sublime.platform() instead of os.name for getting platform name.
   (vifo)
 * Now catching EnvironmentError exceptions instead of OSError in
@@ -249,7 +251,9 @@ Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
 * Added messages to be displayed by Package Control on installation and
   upgrades in "messages/". Added "messages.json" to link the messages. (vifo)
 * Removed accessors: get_perltidy_options(), get_perltidy_rc_paths(). (vifo)
-* Improved documentation. (vifo)
+* Refactored most of the code and moved it to perltidy/helpers.py, so we can
+  test it, without mocking too much. (vifo)
+* Documentation improved. (vifo)
 
 ### v0.1.0 - 2012-11-26 19:20:35 +0100
 
