@@ -1,5 +1,5 @@
 *.pyc
-*.sublime-*
+*.sublime-project
 .coverage
 .pythoscope
 COMMIT
