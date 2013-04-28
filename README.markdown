@@ -2,8 +2,6 @@
 
 [![Build Status](https://secure.travis-ci.org/vifo/SublimePerlTidy.png)](http://travis-ci.org/vifo/SublimePerlTidy)
 
-https://api.travis-ci.org/vifo/SublimePerlTidy.png
-
 PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/), which integrates [perltidy](http://perltidy.sourceforge.net/) into ST2. It indents and reformats Perl source code to make it easier to read.
 
 This plugin is formerly known as *st2-perltidy* and has been renamed order to match the Sublime Text plugin naming conventions.
