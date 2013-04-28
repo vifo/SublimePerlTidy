@@ -1,6 +1,12 @@
-# PerlTidy for Sublime Text 2
+# perltidy for Sublime Text 2
 
 PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/), which integrates [perltidy](http://perltidy.sourceforge.net/) into ST2. It indents and reformats Perl source code to make it easier to read.
+
+This plugin is formerly known as *st2-perltidy* and has been renamed order to match the Sublime Text plugin naming conventions.
+
+## Sublime Text 3 Support
+
+[Sublime Text 3](http://www.sublimetext.com/3) is not supported right now. Support is planned, but my time is spare. Contributors welcome.
 
 ## Installation
 
@@ -8,11 +14,11 @@ PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/), which in
 
 Once you have installed Package Control, restart Sublime Text 2 and bring up the Command Palette (press `Control+Shift+P` on Linux/Windows, `Command+Shift+P` on OS X, or select `Tools->Command Palette...` from menu). Select "Package Control: Install Package", wait till Package Control fetches the latest package list, then select "PerlTidy" from the list of available packages. The advantage of using this method is, that Package Control will automatically keep PerlTidy up to date with the latest version.
 
-**Without Git:** Download the latest source from [GitHub](https://github.com/rbo/st2-perltidy/downloads) and copy the folder *st2-perltidy* to your Sublime Text *Packages* directory.
+**Without Git:** Download the latest source from [GitHub](https://github.com/vifo/SublimePerlTidy/downloads) and copy the folder *SublimePerlTidy* to your Sublime Text *Packages* directory.
 
 **With Git:** Clone the repository in your Sublime Text *Packages* directory:
 
-    git clone https://github.com/rbo/st2-perltidy
+    git clone https://github.com/vifo/SublimePerlTidy
 
 The *Packages* directory is located at:
 
@@ -225,6 +231,13 @@ import platform; import sublime; import datetime; print '-' * 78; print "Date/ti
 * Implement automatic tidying of Perl files upon save. Until then, [SublimeOnSaveBuild](https://github.com/alexnj/SublimeOnSaveBuild) might be an option to achieve this.
 
 ## Changes
+
+### v0.3.0 2013-04-28 12:40:00 +0200
+
+Repo/plugin renamed from rbo/st2-perltidy to vifo/SublimePerlTidy.
+
+* Version number bumped to 0.3.0. (vifo)
+* Documentation updated according to renaming done. (vifo)
 
 ### v0.2.1 2013-04-13 14:38:00 +0200
 

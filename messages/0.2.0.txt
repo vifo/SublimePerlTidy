@@ -1,4 +1,4 @@
-PerlTidy for Sublime Text 2
+perltidy for Sublime Text 2
 ===========================
 
 Version: 0.2.0
@@ -17,6 +17,6 @@ What's new?
 
 Please refer to:
 
-    https://github.com/rbo/st2-perltidy
+    https://github.com/vifo/SublimePerlTidy
 
 for full documentation.

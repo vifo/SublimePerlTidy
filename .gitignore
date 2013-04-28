@@ -5,7 +5,6 @@
 COMMIT
 htmlcov
 misc
+nohup.out
 perltidyrc
 test*.pl
-nohup.out
-
