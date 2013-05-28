@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, unicode_literals
 import codecs
-import exceptions
 import os
 import os.path
 import sys
@@ -11,12 +11,37 @@ import subprocess
 import tempfile
 
 
+# Support Python 2.6/Python 3.x at same time with workarounds taken from
+# https://pypi.python.org/pypi/six
+PY3 = sys.version_info[0] == 3
+
+if PY3:
+    string_types = str,
+    integer_types = int,
+    text_type = str
+    binary_type = bytes
+else:
+    string_types = basestring,
+    integer_types = (int, long)
+    text_type = unicode
+    binary_type = str
+
+# Create null WindowsError exception non-Windows.
+try:
+    WindowsError
+except NameError:
+    class WindowsError(Exception):
+        pass
+
+
 class PerlTidyRuntimeError(Exception):
+
     def __init__(self, value):
         self.value = value
 
 
 class PerlTidyNullLogger:
+
     def log(self, level, message):
         pass
 
@@ -39,7 +64,8 @@ def cygwin_path_from_windows_path(filepath=None):
         return None
 
     if not os.path.isabs(filepath):
-        raise ValueError('Argument "filepath" passed to cygwin_path_from_windows_path() must be an absolute file path')
+        raise ValueError(
+            'Argument "filepath" passed to cygwin_path_from_windows_path() must be an absolute file path')
 
     def repl(m):
         return '/cygdrive/{0}/{1}'.format(m.group(1).lower(), re.sub(r'\\', '/', m.group(2)))
@@ -52,7 +78,8 @@ def cygwin_path_from_windows_path(filepath=None):
 # Find perltidy in PATH.
 def find_perltidy_in_path(logger=PerlTidyNullLogger()):
     cmd = None
-    perltidy_filename = 'perltidy.bat' if sublime.platform() == 'windows' else 'perltidy'
+    perltidy_filename = 'perltidy.bat' if sublime.platform(
+    ) == 'windows' else 'perltidy'
 
     for path in os.environ['PATH'].split(os.pathsep):
         cmd_path = os.path.join(path, perltidy_filename)
@@ -74,7 +101,8 @@ def find_perltidy_in_platform_default_paths(logger=PerlTidyNullLogger()):
         # and using Strawberry Perl/ActivePerl or Cygwin.
 
         if not get_perltidy_env_flag('ignore_strawberry_perl'):
-            cmd = ["C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy"]
+            cmd = ["C:\\Strawberry\\perl\\bin\\perl.exe",
+                   "C:\\Strawberry\\perl\\site\\bin\\perltidy"]
             if is_valid_perltidy_cmd(cmd, cmd_source='platform defs', logger=logger):
                 if os.path.isfile(cmd[1]):
                     return cmd
@@ -114,8 +142,10 @@ def find_perltidyrc_in_project(directories=[], perltidyrc_paths=[], logger=PerlT
             for perltidyrc_path in perltidyrc_paths:
 
                 # Construct absolute path, if not absolute yet.
-                perltidyrc_path = perltidyrc_path if os.path.isabs(perltidyrc_path) else os.path.join(directory, perltidyrc_path)
-                logger.log(2, 'Checking for perltidyrc: ' + pp(perltidyrc_path))
+                perltidyrc_path = perltidyrc_path if os.path.isabs(
+                    perltidyrc_path) else os.path.join(directory, perltidyrc_path)
+                logger.log(2, 'Checking for perltidyrc: ' + pp(
+                    perltidyrc_path))
 
                 # Does this perltidyrc file exist?
                 if os.path.isfile(perltidyrc_path):
@@ -130,6 +160,19 @@ def find_perltidyrc_in_project(directories=[], perltidyrc_paths=[], logger=PerlT
         logger.log(2, 'No perltidyrc found in project.')
 
     return perltidyrc_path
+
+
+# Return, whether string can be encoded in ASCII without losing information.
+def is_ascii_safe_string(input):
+    """Returns True, if string passed in "input" can be safely encoded in ASCII, False otherwise."""
+
+    input_bytes = input.encode('utf-8')
+
+    try:
+        input_bytes.decode('ascii')
+        return True
+    except (UnicodeDecodeError, UnicodeEncodeError) as e:
+        return False
 
 
 # Check, if given perltidy command is valid. For now, we can only check, if
@@ -152,14 +195,17 @@ def is_valid_perltidy_cmd(cmd, cmd_source=None, logger=PerlTidyNullLogger()):
 
     if type(cmd) is list and len(cmd) > 0:
         if logger.log_level() >= 2:
-            cmd_source_verbose = ' (' + cmd_source + '): ' if cmd_source is not None else ': '
-            logger.log(2, 'Checking for perltidy' + cmd_source_verbose + pp(cmd))
+            cmd_source_verbose = ' (' + cmd_source + \
+                '): ' if cmd_source is not None else ': '
+            logger.log(
+                2, 'Checking for perltidy' + cmd_source_verbose + pp(cmd))
 
         if os.path.isfile(cmd[0]):
             return True
 
         if cmd_source == 'user':
-            logger.log(0, 'Command {0} specified in user setting "perltidy_cmd" seems to be invalid. Ignoring and trying to find perltidy automatically.'.format(pp(cmd[0])))
+            logger.log(0, 'Command {0} specified in user setting "perltidy_cmd" seems to be invalid. Ignoring and trying to find perltidy automatically.'.format(
+                pp(cmd[0])))
         else:
             logger.log(2, 'Command not found: ' + pp(cmd[0]))
 
@@ -173,14 +219,14 @@ def pp(string):
     if string is None:
         return '<None>'
 
-    result = []
+    tokens = []
     if type(string) is list:
         for i in string:
-            result.append('"' + i + '"')
+            tokens.append('"{0}"'.format(i))
     else:
-        result.append('"' + string + '"')
+        tokens.append('"{0}"'.format(string))
 
-    return ' '.join(result)
+    return ' '.join(tokens)
 
 
 # Tidy given region; returns True on success or False on perltidy runtime
@@ -194,19 +240,11 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
     """
 
     if type(cmd) is not list:
-        raise ValueError('Argument "cmd" passed to run_perltidy() must be a list')
-    if type(input) is not unicode and type(input) is not str:
-        raise ValueError('Argument "input" passed to run_perltidy() must be a string')
-
-    # Map WindowsError exception to None on non-Windows.
-    try:
-        WindowsError
-    except NameError:
-        WindowsError = None
-
-    perltidy_stderr_fh, perltidy_stderr_filepath = tempfile.mkstemp()
-    os.close(perltidy_stderr_fh)
-    perltidy_stderr_fh = codecs.open(perltidy_stderr_filepath, 'w+b', encoding='utf-8')
+        raise ValueError(
+            'Argument "cmd" passed to run_perltidy() must be a list')
+    if not isinstance(input, string_types):
+        raise ValueError(
+            'Argument "input" passed to run_perltidy() must be a string')
 
     # Prepare arguments for subprocess call.
     subprocess_args = {
@@ -220,20 +258,21 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
     # Hide console window on Windows.
     if sublime.platform() == 'windows':
         subprocess_args['startupinfo'] = subprocess.STARTUPINFO()
-        subprocess_args['startupinfo'].dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-    # Check, if the data to be tidied has any non-ASCII characters. If yes,
-    # prepare temporary files for input and output with UTF-8 encoding, and
-    # spool the input to file. Adjust perltidy call, so data will be read and
-    # written to temporary files.
-    use_temporary_files = False
+        subprocess_args[
+            'startupinfo'].dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
     cmd_final = []
     cmd_final.extend(cmd)
 
-    try:
-        input.decode('ascii')
-    except UnicodeEncodeError:
+    # Check, if the data to be tidied has any non-ASCII characters. If yes,
+    # prepare temporary files for input and output with UTF-8 encoding, and
+    # spool the input to file. Adjust perltidy call, so data will be read and
+    # written from/to temporary files.
+    use_temporary_files = False
+
+    if is_ascii_safe_string(input):
+        input = input.encode('ascii')       # convert input from str to bytes
+    else:
         use_temporary_files = True
 
     if use_temporary_files:
@@ -247,10 +286,11 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
 
         with codecs.open(perltidy_input_filepath, 'w+b', encoding='utf-8') as fh:
             fh.write(input)
+        input = None
 
+        cmd_final.append('-nst')
         cmd_final.append(perltidy_input_filepath)
         cmd_final.append('-o=' + perltidy_output_filepath)
-        input = None
 
     # Show time!
     success, output, error_output, error_hints = False, None, None, []
@@ -274,23 +314,25 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
             os.environ['LANG'] = 'C'
 
         p = subprocess.Popen(cmd_final, **subprocess_args)
+
         output, error_output = p.communicate(input)
         logger.log(2, 'Command exited with code: {0}'.format(p.returncode))
 
         # If we're using temporary files for I/O, load output from output file
-        # and cleanup temporary files.
+        # and cleanup temporary files. Otherwise decode pipe output from bytes
+        # to str.
         if use_temporary_files:
             with codecs.open(perltidy_output_filepath, 'rb', encoding='utf-8') as fh:
                 output = fh.read()
-
-            if not get_perltidy_env_flag('keep_temp_files'):
-                os.unlink(perltidy_input_filepath)
-                os.unlink(perltidy_output_filepath)
-
-        if not error_output:
-            success = True
         else:
-            error_output = error_output.decode('ascii', 'replace')
+            output = output.decode('utf-8')
+
+        # Decode error output (if any), otherwise clear it and set success.
+        if error_output:
+            error_output = error_output.decode('utf-8')
+        else:
+            success = True
+            error_output = ''
 
     # Handle OS errors. Check, if we can give the user some hints.
     except (WindowsError, EnvironmentError) as e:
@@ -313,6 +355,11 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
                     '"perltidy_log_level" and try again.')
 
     finally:
+        # Cleanup.
+        if use_temporary_files and not get_perltidy_env_flag('keep_temp_files'):
+            os.unlink(perltidy_input_filepath)
+            os.unlink(perltidy_output_filepath)
+
         if sublime.platform() == 'windows':
 
             # Restore environment variables.

@@ -1,22 +1,27 @@
-perltidy for Sublime Text 2
-===========================
-Thank you for installing SublimePerlTidy! Below are some quick notes to get
-you started with the plugin. Please refer to:
+perltidy for Sublime Text 2/3
+=============================
+
+Version: 0.4.0
+
+Thanks for installing PerlTidy! Below are some quick notes to get you started.
+Please refer to:
 
     https://github.com/vifo/SublimePerlTidy
 
-for the full documentation.
+for full documentation.
 
 Quick start
 -----------
-To reformat Perl source code with SublimePerlTidy, open your Perl file of
-choice and hit Ctrl+Shift+t on Windows/Linux and Super+Shift+t on OSX.
 
-SublimePerlTidy will try to find your perltidy installation by looking at your
-PATH settings and searching for perltidy in default installation locations.
+To reformat Perl source code with PerlTidy, open your Perl file of choice and
+hit `Control+Shift+t`.
+
+PerlTidy will try to find your perltidy installation by looking at your PATH
+environment variable and in addition by searching for perltidy in default
+installation locations.
 
 Should this automatic detection fail, please inspect any error output on the
-Sublime Text 2 console and adjust user setting "perltidy_cmd" as described in
+Sublime Text console and adjust user setting "perltidy_cmd" as described in
 the full documentation.
 
 Thank You.

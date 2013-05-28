@@ -5,6 +5,7 @@ Version: 0.3.0
 
 What's new?
 -----------
+
 * Plugin has been renamed from st2-perltidy to SublimePerlTidy. It now appears
   as "PerlTidy" in Sublime Text Package Control.
 
