@@ -6,7 +6,7 @@ PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/) and [Subl
 
 ## Quick start
 
-* Ensure, you have a Perl interpreter and perltidy installed (hint: `apt-get install perltidy`, `yum install perltidy`, `cpan[m] Perl::Tidy`)
+* Ensure, you have a Perl interpreter and perltidy installed (hint: `apt-get install perltidy`, `yum install perltidy`, `cpan[m] Perl::Tidy`, `ppm install Perl-Tidy`)
 * Install this plugin in Sublime Text via Package Control, git or from ZIP (in Sublime Text the plugin is named *PerlTidy*, **not** *SublimePerlTidy*)
 * Open a Perl source file and hit `Control+Shift+t`
 
@@ -73,7 +73,7 @@ PerlTidy will try to locate perltidy by:
 
   Default [Strawberry Perl](http://strawberryperl.com/) installation location *C:\Strawberry*, i.e.:
 
-  `"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]```
+  ```"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]```
 
   Default [ActivePerl](http://www.activestate.com/activeperl) installation location *C:\Perl*, i.e.:
 
@@ -109,24 +109,26 @@ which, at least with a recent perltidy version is effectively the same as:
 
 Ermmm, what?! Fear not, here are the explanations (and differences with perltidy defaults):
 
-| PBP Option      | Description                                               | perltidy Defaults |
-| --------------- | --------------------------------------------------------- | ----------------- |
-| `-l=78`         | Maximum line width is 78 columns                          | `-l=80`           |
-| `-i=4`          | Use 4 columns per indentation level                       | *same*            |
-| `-ci=4`         | Continuation indentation is 4 columns                     | `-ci=2            |
-| `-vt=2`         | Maximal vertical tightness                                | `-vt=0`           |
-| `-cti=0`        | No extra indentation for closing brackets                 | `-cti=0`          |
-| `-pt=1`         | Medium parenthesis tightness                              | *same*            |
-| `-bt=1`         | Medium brace tightness                                    | *same*            |
-| `-sbt=1`        | Medium square bracket tightness                           | *same*            |
-| `-bbt=1`        | Medium block brace tightness                              | `-bbt=0`          |
-| `-nsfs`         | No space before semicolons                                | `-sfs`            |
-| `-nolq`         | Don't outdent long quoted strings                         | `-olq`            |
-| `-wbb="..."     | Break before these tokens (operators)                     | *none*            |
-| `-st`           | Output to STDOUT                                          | *none*            |
-| `-se`           | Errors to STDERR                                          | *none*            |
+| PBP Option      | perltidy Defaults | Description                                                   |
+| --------------- | ----------------- | ------------------------------------------------------------- |
+| `-l=78`         | `-l=80`           | Maximum line width is 78/80 columns                           |
+| `-i=4`          | *same*            | Use 4 columns per indentation level                           |
+| `-ci=4`         | `-ci=2`           | Continuation indentation is 4/2 columns                       |
+| `-vt=2`         | `-vt=0`           | Vertical tightness set to maximum/minimum                     |
+| `-cti=0`        | *same*            | No extra indentation for closing tokens                       |
+| `-pt=1`         | *same*            | Medium parenthesis tightness                                  |
+| `-bt=1`         | *same*            | Medium brace tightness                                        |
+| `-sbt=1`        | *same*            | Medium square bracket tightness                               |
+| `-bbt=1`        | `-bbt=0`          | Medium/minimal block brace tightness                          |
+| `-nsfs`         | `-sfs`            | Additional space for semicolons in for loops disabled/enabled |
+| `-nolq`         | `-olq`            | Outdenting of overly long quoted strings disabled/enabled     |
+| `-wbb="..."`    | *none*            | Break before these tokens (operators)                         |
+| `-st`           | *none*            | Output to STDOUT                                              |
+| `-se`           | *none*            | Errors to STDERR                                              |
 
-You may override the above settings by changing user setting "perltidy_options" in your preferences.
+You may override any of the above settings by changing user setting "perltidy_options" in your preferences, preferably including the `-pbp` option like this:
+
+    "perltidy_options": [ "-pbp", "-l=120" ]
 
 Please refer to the official [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
 
@@ -136,7 +138,7 @@ Defaults to `Control+Shift+t` on all platforms. Feel free to change this in `Pre
 
     // PerlTidy key bindings
     {
-        "keys": ["ctrl+t"],
+        "keys": ["ctrl+shift+t"],
         "command": "perl_tidy",
         "context": [ { "key": "selector", "operator": "equal", "operand": "source.perl", "match_all": true } ]
     }
@@ -201,7 +203,7 @@ You may override any of these settings per project, by adding a section named "s
         ],
         "settings": {
             "perltidy_log_level": 2,
-            "perltidy_options": [ "-l=120", "-ole=unix", "-w", "-se" ]
+            "perltidy_options": [ "-pbp", "-l=120", "-w" ]
         }
     }
 
@@ -247,9 +249,9 @@ In order to make bug hunting easier, please ensure, that you always run the *lat
 
 * Operating system architecture (i.e. 32-bit, 64-bit)
 
-* Sublime Text 2 build number (open `Help->About`)
+* Sublime Text build number (open `Help->About`)
 
-* Output from Sublime Text 2 console
+* Output from Sublime Text console
 
 To gather this information quickly, open ST console, type in the following Python code as-is (in one line) and include its output in your issue:
 
@@ -265,10 +267,10 @@ from __future__ import print_function, unicode_literals;import platform, sublime
 
 Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/README.markdown) for all changes.
 
-### v0.4.0 2013-05-31 16:15:00 +0200
+### v0.4.0 2013-05-31 20:00:00 +0200
 
 * Sublime Text 3 support added. Most of porting to Python 3 has been done
-  using information from http://python3porting.com/noconv.html (vifo)
+  using information from http://python3porting.com/noconv.html. (vifo)
 * Default perltidy options changed. PerlTidy will now use the PBP set of
   perltidy options. (vifo)
 * Default key binding for OS X changed from `Command+Shift+t` to

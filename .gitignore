@@ -1,9 +1,11 @@
 *.pyc
 *.sublime-*
+.cover
 .coverage
 .pythoscope
 COMMIT
-htmlcov
+cover/
+htmlcov/
 misc
 nohup.out
 perltidyrc

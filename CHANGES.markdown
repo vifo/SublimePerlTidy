@@ -2,10 +2,10 @@
 
 ## Changes
 
-### v0.4.0 2013-05-31 16:15:00 +0200
+### v0.4.0 2013-05-31 20:00:00 +0200
 
 * Sublime Text 3 support added. Most of porting to Python 3 has been done
-  using information from http://python3porting.com/noconv.html (vifo)
+  using information from http://python3porting.com/noconv.html. (vifo)
 * Default perltidy options changed. PerlTidy will now use the PBP set of
   perltidy options. (vifo)
 * Default key binding for OS X changed from `Command+Shift+t` to
