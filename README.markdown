@@ -265,7 +265,7 @@ from __future__ import print_function, unicode_literals;import platform, sublime
 
 ## Changes
 
-Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/README.markdown) for all changes.
+Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/CHANGES.markdown) for all changes.
 
 ### v0.4.0 2013-05-31 20:00:00 +0200
 
