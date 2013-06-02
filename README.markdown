@@ -259,6 +259,18 @@ To gather this information quickly, open ST console, type in the following Pytho
 from __future__ import print_function, unicode_literals;import platform, sublime, datetime;print('-' * 78);print('Date/time: {0}'.format(datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S +0000')));print('Sublime Text version: {0}'.format(sublime.version()));print('Platform: {0}'.format(sublime.platform()));print('CPU architecture: {0}'.format(sublime.arch()));print('OS info: {0}'.format(repr(platform.platform())));print('-' * 78)
 ```
 
+## Miscellaneous
+
+### Standalone perltidy executable for Windows
+
+If you're running Sublime Text on Windows and don't like to install a complete Perl interpreter just for using perltidy, grab the standalone perltidy executable [from here](https://perltidy.s3.amazonaws.com/perltidy-20121207-x86.exe) and adjust your settings:
+
+    "perltidy_cmd": [ "C:\\WHEREVER_YOU_HAVE_DOWNLOADED_THE_EXE_TO\\perltidy-20121207-x86.exe" ]
+
+This executable has been built with [ActiveState ActivePerl 5.16.3.1603 x86](http://www.activestate.com/activeperl/downloads) using [PAR::Packer](https://metacpan.org/search?q=PAR%3A%3APacker+pp). It contains the Perl interpreter as well as the latest version of perltidy, including all required dependencies in a self contained executable (thus the size of 4.5 MB).
+
+Please note: this executable works for me and is provided **as-is**, with no support whatsoever. If it also works for you, great! If not, please don't complain, but get a Perl interpreter and perltidy for Windows instead. Even better: fix errors, repackage (maybe using helper script "helpers/build_perltidy_20121207_x86.pl" as a starting point) and provide final executable to me for hosting on S3.
+
 ## TODOs
 
 * Implement automatic tidying of Perl files upon save. Until then, [SublimeOnSaveBuild](https://github.com/alexnj/SublimeOnSaveBuild) might be an option to achieve this.

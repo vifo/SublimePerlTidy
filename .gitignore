@@ -5,6 +5,7 @@
 .pythoscope
 COMMIT
 cover/
+helpers/build/
 htmlcov/
 misc
 nohup.out
