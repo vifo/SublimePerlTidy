@@ -2,6 +2,12 @@
 
 ## Changes
 
+### v0.4.1 2013-06-23 18:00:00 +0200
+
+* Fixed bug with empty rows (CRLFs) being inserted into formatted source
+  code under Windows. Fixes #17. (vifo)
+* Support and tests for ActivePerl 64-bit added. (vifo)
+
 ### v0.4.0 2013-05-31 20:00:00 +0200
 
 * Sublime Text 3 support added. Most of porting to Python 3 has been done

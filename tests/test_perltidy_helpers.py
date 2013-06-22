@@ -23,6 +23,10 @@ PERLTIDY_INPUTS = {
         'input': '#!/usr/bin/env perl\nuse strict;\n  use utf8; $foo = "äöüÄÖÜ";',
         'output': '#!/usr/bin/env perl\nuse strict;\nuse utf8;\n$foo = "äöüÄÖÜ";\n',
     },
+    'lf': {
+        'input': '#!/usr/bin/env perl\r\nuse strict;\r\n;',
+        'output': '#!/usr/bin/env perl\nuse strict;\n',
+    },
 }
 
 
@@ -73,7 +77,7 @@ class PerlTidyInterpreterTestCase(PerlTidyTestCase):
 
     def test_run_perltidy(self):
         self.skip_if_have_reason()
-        for key in ['ascii', 'utf8']:
+        for key in ['ascii', 'utf8', 'lf']:
             success, output, error_output, error_hints = run_perltidy(
                 cmd=self.perltidy_cmd, input=PERLTIDY_INPUTS[key]['input'], logger=self.logger)
             assert_equal(success, True)
@@ -143,7 +147,7 @@ class TestPerlTidyHelpers(PerlTidyTestCase):
 
     def test_find_perltidy_in_platform_default_paths(self):
         def perltidy_clear_env_flags():
-            for key in ['ignore_activeperl', 'ignore_cygwin', 'ignore_strawberry_perl']:
+            for key in ['ignore_activeperl_32', 'ignore_activeperl_64', 'ignore_cygwin', 'ignore_strawberry_perl']:
                 set_perltidy_env_flag(key, None)
 
         if is_windows():
@@ -154,12 +158,22 @@ class TestPerlTidyHelpers(PerlTidyTestCase):
                 out = ['C:\\Strawberry\\perl\\bin\\perl.exe', 'C:\\Strawberry\\perl\\site\\bin\\perltidy']
                 assert_equal(out, find_perltidy_in_platform_default_paths(logger=self.logger))
 
-            if get_perltidy_env_flag('test_activeperl'):
+            if get_perltidy_env_flag('test_activeperl_64'):
                 perltidy_clear_env_flags()
 
                 # Simulate, we don't have Strawberry Perl. Must return ActivePerl
-                # location, either 32-bit or 64-bit.
+                # 64-bit location.
                 set_perltidy_env_flag('ignore_strawberry_perl', True)
+                out = ['C:\\Perl64\\bin\\perl.exe', 'C:\\Perl64\\site\\bin\\perltidy']
+                assert_equal(out, find_perltidy_in_platform_default_paths(logger=self.logger))
+
+            if get_perltidy_env_flag('test_activeperl_32'):
+                perltidy_clear_env_flags()
+
+                # Simulate, we don't have Strawberry Perl and don't have
+                # ActivePerl 64-bit. Must return ActivePerl 32-bit location.
+                set_perltidy_env_flag('ignore_strawberry_perl', True)
+                set_perltidy_env_flag('ignore_activeperl_64', True)
                 out = ['C:\\Perl\\bin\\perl.exe', 'C:\\Perl\\site\\bin\\perltidy']
                 assert_equal(out, find_perltidy_in_platform_default_paths(logger=self.logger))
 
@@ -169,7 +183,8 @@ class TestPerlTidyHelpers(PerlTidyTestCase):
                 perltidy_clear_env_flags()
 
                 set_perltidy_env_flag('ignore_strawberry_perl', True)
-                set_perltidy_env_flag('ignore_activeperl', True)
+                set_perltidy_env_flag('ignore_activeperl_64', True)
+                set_perltidy_env_flag('ignore_activeperl_32', True)
                 out = ['C:\\Cygwin\\bin\\perl.exe', '/usr/local/bin/perltidy']
                 assert_equal(out, find_perltidy_in_platform_default_paths(logger=self.logger))
 
@@ -205,9 +220,9 @@ class TestPerlTidyHelpersWindows(PerlTidyTestCase):
     def test_find_perltidy_in_path(self):
         self.skip_if_have_reason()
         old_path = os.environ['PATH']
-        os.environ['PATH'] = 'C:\\Perl\\site\\bin' + os.pathsep + old_path
+        os.environ['PATH'] = 'C:\\Perl64\\site\\bin' + os.pathsep + old_path
 
-        cmd = ['C:\\Perl\\site\\bin\\perltidy.bat']
+        cmd = ['C:\\Perl64\\site\\bin\\perltidy.bat']
         assert_equal(cmd, find_perltidy_in_path(logger=self.logger))
 
         os.environ['PATH'] = old_path
@@ -279,17 +294,34 @@ class TestPerlTidyHelpersNonWindows(PerlTidyTestCase):
         assert_equal(cygwin_path_from_windows_path('C:\\Users\\FooBarBaz'), None)
 
 
-# Interpreter specific tests on Windows/ActivePerl.
-class TestPerlTidyHelpersWindowsActivePerlInterpreter(PerlTidyInterpreterTestCase):
+# Interpreter specific tests on Windows/ActivePerl (64-bit).
+class TestPerlTidyHelpersWindowsActivePerl64Interpreter(PerlTidyInterpreterTestCase):
 
     def setUp(self):
         PerlTidyInterpreterTestCase.setUp(self)
-        self.perltidy_cmd = ['C:\\Perl\\bin\\perl.exe', 'C:\\Perl\\site\\bin\\perltidy', '-ole=unix', '-se']
+        self.perltidy_cmd = ['C:\\Perl64\\bin\\perl.exe', 'C:\\Perl64\\site\\bin\\perltidy', '-pbp', '-ole=unix']
 
         if not is_windows():
             self.skip_reason = 'Not running on Windows'
-        elif not get_perltidy_env_flag('test_activeperl'):
-            self.skip_reason = "Not testing ActivePerl (ENV['PERLTIDY_TEST_HAVE_ACTIVEPERL'] not set)"
+        elif not get_perltidy_env_flag('test_activeperl_64'):
+            self.skip_reason = "Not testing ActivePerl 64-bit (ENV['PERLTIDY_TEST_TEST_ACTIVEPERL_64'] not set)"
+
+    def test_is_valid_perltidy_cmd(self):
+        PerlTidyInterpreterTestCase.test_is_valid_perltidy_cmd(self)
+        assert_equal(True, is_valid_perltidy_cmd(cmd=['C:\\Perl64\\site\\bin\\perltidy.bat'], logger=self.logger))
+
+
+# Interpreter specific tests on Windows/ActivePerl (32-bit).
+class TestPerlTidyHelpersWindowsActivePerl32Interpreter(PerlTidyInterpreterTestCase):
+
+    def setUp(self):
+        PerlTidyInterpreterTestCase.setUp(self)
+        self.perltidy_cmd = ['C:\\Perl\\bin\\perl.exe', 'C:\\Perl\\site\\bin\\perltidy', '-pbp', '-ole=unix']
+
+        if not is_windows():
+            self.skip_reason = 'Not running on Windows'
+        elif not get_perltidy_env_flag('test_activeperl_32'):
+            self.skip_reason = "Not testing ActivePerl 32-bit (ENV['PERLTIDY_TEST_TEST_ACTIVEPERL_32'] not set)"
 
     def test_is_valid_perltidy_cmd(self):
         PerlTidyInterpreterTestCase.test_is_valid_perltidy_cmd(self)
@@ -301,7 +333,7 @@ class TestPerlTidyHelpersWindowsCygwinInterpreter(PerlTidyInterpreterTestCase):
 
     def setUp(self):
         PerlTidyInterpreterTestCase.setUp(self)
-        self.perltidy_cmd = ['C:\\Cygwin\\bin\\perl.exe', '/usr/local/bin/perltidy', '-ole=unix', '-se']
+        self.perltidy_cmd = ['C:\\Cygwin\\bin\\perl.exe', '/usr/local/bin/perltidy', '-pbp', '-ole=unix']
 
         if not is_windows():
             self.skip_reason = 'Not running on Windows'
@@ -315,7 +347,7 @@ class TestPerlTidyHelpersWindowsStrawberryPerlInterpreter(PerlTidyInterpreterTes
     def setUp(self):
         PerlTidyInterpreterTestCase.setUp(self)
         self.perltidy_cmd = ['C:\\Strawberry\\perl\\bin\\perl.exe',
-                             'C:\\Strawberry\\perl\\site\\bin\\perltidy', '-ole=unix', '-se']
+                             'C:\\Strawberry\\perl\\site\\bin\\perltidy', '-pbp', '-ole=unix']
 
         if not is_windows():
             self.skip_reason = 'Not running on Windows'
@@ -333,7 +365,7 @@ class TestPerlTidyHelpersNonWindowsDefaultInterpreter(PerlTidyInterpreterTestCas
 
     def setUp(self):
         PerlTidyInterpreterTestCase.setUp(self)
-        self.perltidy_cmd = ['/usr/bin/perltidy', '-ole=unix', '-se']
+        self.perltidy_cmd = ['/usr/bin/perltidy', '-pbp', '-ole=unix']
 
         if is_windows():
             self.skip_reason = 'Running on Windows'

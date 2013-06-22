@@ -107,7 +107,13 @@ def find_perltidy_in_platform_default_paths(logger=PerlTidyNullLogger()):
                 if os.path.isfile(cmd[1]):
                     return cmd
 
-        if not get_perltidy_env_flag('ignore_activeperl'):
+        if not get_perltidy_env_flag('ignore_activeperl_64'):
+            cmd = ["C:\\Perl64\\bin\\perl.exe", "C:\\Perl64\\site\\bin\\perltidy"]
+            if is_valid_perltidy_cmd(cmd, cmd_source='platform defs', logger=logger):
+                if os.path.isfile(cmd[1]):
+                    return cmd
+
+        if not get_perltidy_env_flag('ignore_activeperl_32'):
             cmd = ["C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy"]
             if is_valid_perltidy_cmd(cmd, cmd_source='platform defs', logger=logger):
                 if os.path.isfile(cmd[1]):
@@ -263,6 +269,10 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
 
     cmd_final = []
     cmd_final.extend(cmd)
+
+    # Ensure, that perltidy always returns LF line endings, so we match the
+    # internal buffer line endings.
+    cmd_final.append('-ole=unix')
 
     # Check, if the data to be tidied has any non-ASCII characters. If yes,
     # prepare temporary files for input and output with UTF-8 encoding, and

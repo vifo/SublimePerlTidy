@@ -75,7 +75,11 @@ PerlTidy will try to locate perltidy by:
 
   ```"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]```
 
-  Default [ActivePerl](http://www.activestate.com/activeperl) installation location *C:\Perl*, i.e.:
+  Default [ActivePerl 64-bit](http://www.activestate.com/activeperl) installation location *C:\Perl64*, i.e.:
+
+  ```"perltidy_cmd": [ "C:\\Perl64\\bin\\perl.exe", "C:\\Perl64\\site\\bin\\perltidy" ]```
+
+  Default [ActivePerl 32-bit](http://www.activestate.com/activeperl) installation location *C:\Perl*, i.e.:
 
   ```"perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]```
 
@@ -232,12 +236,14 @@ You have specified the path to the raw Perl "perltidy" file (without extension),
 TL;DR: Assuming you are running a vanilla Strawberry Perl/ActivePerl installation: adjust user setting "perltidy_cmd" to one of the following:
 
     "perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]    # for Strawberry Perl
-    "perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]                            # for ActivePerl
+    "perltidy_cmd": [ "C:\\Perl64\\bin\\perl.exe", "C:\\Perl64\\site\\bin\\perltidy" ]                        # for ActivePerl 64-bit
+    "perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]                            # for ActivePerl 32-bit
 
 or, if you really need to use the batch wrapper for some (non-obvious) reasons, to:
 
     "perltidy_cmd": "C:\\Strawberry\\perl\\site\\bin\\perltidy.bat"       # for Strawberry Perl
-    "perltidy_cmd": "C:\\Perl\\site\\bin\\perltidy.bat"                   # for ActivePerl
+    "perltidy_cmd": "C:\\Perl64\\site\\bin\\perltidy.bat                  # for ActivePerl 64-bit
+    "perltidy_cmd": "C:\\Perl\\site\\bin\\perltidy.bat"                   # for ActivePerl 32-bit
 
 or just let PerlTidy figure out where perltidy is located by **not setting** "perltidy_cmd" at all.
 
@@ -279,6 +285,12 @@ Please note: this executable works for me and is provided **as-is**, with no sup
 
 Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/CHANGES.markdown) for all changes.
 
+### v0.4.1 2013-06-23 18:00:00 +0200
+
+* Fixed bug with empty rows (CRLFs) being inserted into formatted source
+  code under Windows. Fixes #17. (vifo)
+* Support and tests for ActivePerl 64-bit added. (vifo)
+
 ### v0.4.0 2013-05-31 20:00:00 +0200
 
 * Sublime Text 3 support added. Most of porting to Python 3 has been done
@@ -298,10 +310,3 @@ Only latest changes are listed here. Refer to [full change log](https://github.c
   (vifo)
 * Documentation updated, Package Control messages updated. (vifo)
 * Full changelog moved to CHANGES.markdown. (vifo)
-
-### v0.3.0 2013-04-28 12:40:00 +0200
-
-Repo/plugin renamed from rbo/st2-perltidy to vifo/SublimePerlTidy.
-
-* Version number bumped to 0.3.0. (vifo)
-* Documentation updated according to renaming done. (vifo)
