@@ -4,6 +4,7 @@
 # regardless whether we're running Python 2 or 3. See
 # http://python3porting.com/noconv.html for more info.
 from __future__ import print_function, unicode_literals
+
 import sys
 import shutil
 import sublime_mocked
@@ -20,12 +21,12 @@ PERLTIDY_INPUTS = {
         'output': '#!/usr/bin/env perl\nuse strict;\n',
     },
     'utf8_1': {
-        'input': u'#!/usr/bin/env perl\nuse strict;\n  use utf8; $foo = "äöüÄÖÜ";',
-        'output': u'#!/usr/bin/env perl\nuse strict;\nuse utf8;\n$foo = "äöüÄÖÜ";\n',
+        'input': '#!/usr/bin/env perl\nuse strict;\n  use utf8; $foo = "äöüÄÖÜ";',
+        'output': '#!/usr/bin/env perl\nuse strict;\nuse utf8;\n$foo = "äöüÄÖÜ";\n',
     },
     'utf8_2': {
-        'input': u"$row->{tipo_doc_id_fmt}  =  '<não definido>' unless $row->{tipo_doc_id_fmt};\n",
-        'output': u"$row->{tipo_doc_id_fmt} = '<não definido>' unless $row->{tipo_doc_id_fmt};\n",
+        'input': "$row->{tipo_doc_id_fmt}  =  '<não definido>' unless $row->{tipo_doc_id_fmt};\n",
+        'output': "$row->{tipo_doc_id_fmt} = '<não definido>' unless $row->{tipo_doc_id_fmt};\n",
     },
     'lf': {
         'input': '#!/usr/bin/env perl\r\nuse strict;\r\n;',
@@ -82,7 +83,8 @@ class PerlTidyInterpreterTestCase(PerlTidyTestCase):
     def test_run_perltidy(self):
         self.skip_if_have_reason()
         for key in ['ascii', 'utf8_1', 'utf8_2', 'lf']:
-            success, output, error_output, error_hints = run_perltidy(cmd=self.perltidy_cmd, input=PERLTIDY_INPUTS[key]['input'], logger=self.logger)
+            success, output, error_output, error_hints = run_perltidy(
+                cmd=self.perltidy_cmd, input=PERLTIDY_INPUTS[key]['input'], logger=self.logger)
             assert_equal(success, True)
             assert_equal(output, PERLTIDY_INPUTS[key]['output'])
             assert_equal(error_output, '')
