@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, unicode_literals
 import sublime
 import sublime_plugin
-from perltidy.helpers import *
+
+try:
+    from .perltidy.helpers import *
+except (Exception) as e:
+    from perltidy.helpers import *
 
 
 DEFAULT_SETTINGS = {
     'perltidy_enabled': True,
     'perltidy_log_level': 0,
-    'perltidy_options': ['-sbl', '-bbt=1', '-pt=2', '-nbbc', '-l=100', '-ole=unix', '-w', '-se'],
-    'perltidy_options_take_precedence': True,
+    'perltidy_options': ['-pbp'],
+    'perltidy_options_take_precedence': False,
     'perltidy_rc_paths': ['.perltidyrc', 'perltidyrc'],
     'perltidy_use_temporary_files': 'auto',
 }
@@ -43,7 +48,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 if is_valid_perltidy_cmd(cmd, cmd_source='user', logger=self):
                     raise StopIteration()
 
-                # 2. Within PATH (search for "perltidy" or "perltidy.bat" on Windows)
+                # 2. Within PATH (search for "perltidy" or "perltidy.bat" on
+                # Windows)
                 cmd = find_perltidy_in_path(logger=self)
                 if cmd is not None:
                     raise StopIteration()
@@ -53,7 +59,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 if cmd is not None:
                     raise StopIteration()
 
-            except StopIteration:
+            except (StopIteration):
                 # Save command for later usage
                 self.log(1, 'Using perltidy: ' + pp(cmd))
                 self._perltidy_cmd = cmd
@@ -77,7 +83,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
         if reload or self._perltidy_options is None:
             self._perltidy_options = settings.get('perltidy_options', DEFAULT_SETTINGS['perltidy_options'])
         if reload or self._perltidy_options_take_precedence is None:
-            self._perltidy_options_take_precedence = settings.get('perltidy_options_take_precedence', DEFAULT_SETTINGS['perltidy_options_take_precedence'])
+            self._perltidy_options_take_precedence = settings.get(
+                'perltidy_options_take_precedence', DEFAULT_SETTINGS['perltidy_options_take_precedence'])
         if reload or self._perltidy_rc_paths is None:
             self._perltidy_rc_paths = settings.get('perltidy_rc_paths', DEFAULT_SETTINGS['perltidy_rc_paths'])
         if reload and self._perltidy_cmd is not None:
@@ -86,13 +93,13 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
     # Simple logging.
     def log(self, level, message):
         if level <= self._perltidy_log_level:
-            print 'PerlTidy: ' + message
+            print('PerlTidy: {0}'.format(message))
 
     # Return current log level.
     def log_level(self):
         return self._perltidy_log_level
 
-    # Main entry point for ST2.
+    # Main entry point for Sublime Text.
     def run(self, edit):
         self.load_settings()
 
@@ -103,7 +110,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 'PATH, nor in platform specific default locations. Please setup your environment ' +
                 'variable PATH, so it contains perltidy, or specify perltidy location in user ' +
                 'setting "perltidy_cmd". Please refer to documentation at ' +
-                'https://github.com/rbo/st2-perltidy for details.')
+                'https://github.com/vifo/SublimePerlTidy for details.')
             return
 
         # Check, if we have any non-empty regions and tidy them.
@@ -117,7 +124,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
         # view. Reposition cursor after tidying up.
         if regions_tidied == 0:
             cursor_pos = self.view.sel()[0]
-            if self.tidy_region(edit, sublime.Region(0L, self.view.size())):
+            if self.tidy_region(edit, sublime.Region(0, self.view.size())):
                 if cursor_pos.empty():
                     self.view.sel().add(cursor_pos)
                     if len(self.view.sel()) > 1:
@@ -134,7 +141,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
         # Check, if we have a perltidyrc in the current project and append to
         # command.
-        perltidyrc_path = find_perltidyrc_in_project(directories=self.view.window().folders(), perltidyrc_paths=self._perltidy_rc_paths, logger=self)
+        perltidyrc_path = find_perltidyrc_in_project(
+            directories=self.view.window().folders(), perltidyrc_paths=self._perltidy_rc_paths, logger=self)
         if perltidyrc_path is not None:
             cmd.append('-pro=' + perltidyrc_path)
 
@@ -148,7 +156,8 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
     def tidy_region(self, edit, region):
 
         # Run perltidy.
-        success, output, error_output, error_hints = run_perltidy(cmd=self.build_perltidy_cmd(), input=self.view.substr(region), logger=self, use_temporary_files=self._perltidy_use_temporary_files)
+        success, output, error_output, error_hints = run_perltidy(
+            cmd=self.build_perltidy_cmd(), input=self.view.substr(region), logger=self)
 
         if success:
             self.view.replace(edit, region, output)
@@ -159,12 +168,10 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 self.log(0, hint)
 
         if error_output:
-            results = self.view.window().new_file()
-            results.set_scratch(True)
-            results.set_name('PerlTidy: Error output')
-            edit = results.begin_edit()
-            results.insert(edit, 0, error_output)
-            results.end_edit(edit)
+            error_output_view = self.view.window().new_file()
+            error_output_view.set_scratch(True)
+            error_output_view.set_name('PerlTidy: Error output')
+            error_output_view.run_command('perl_tidy_error_output', {'output': error_output})
         else:
             sublime.error_message(
                 'PerlTidy: Unable to run perltidy. Please inspect console (hit Ctrl+` ' +

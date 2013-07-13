@@ -1,34 +1,63 @@
-# PerlTidy for Sublime Text 2
+# perltidy for Sublime Text 2/3
 
-PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/), which integrates [perltidy](http://perltidy.sourceforge.net/) into ST2. It indents and reformats Perl source code to make it easier to read.
+[![Build Status](https://secure.travis-ci.org/vifo/SublimePerlTidy.png)](http://travis-ci.org/vifo/SublimePerlTidy)
+
+PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/) and [Sublime Text 3](http://www.sublimetext.com/3), which integrates the command line application [perltidy](http://perltidy.sourceforge.net/) into Sublime Text. It indents and reformats [Perl](http://www.perl.org/) source code to make it easier to read.
+
+## Quick start
+
+* Ensure, you have a Perl interpreter and perltidy installed (hint: `apt-get install perltidy`, `yum install perltidy`, `cpan[m] Perl::Tidy`, `ppm install Perl-Tidy`)
+* Install this plugin in Sublime Text via Package Control, git or from ZIP (in Sublime Text the plugin is named *PerlTidy*, **not** *SublimePerlTidy*)
+* Open a Perl source file and hit `Control+Shift+t`
+
+Read on for detailed installation, usage, configuration and customization instructions.
+
+## Naming conventions
+
+Throughout this documentation, the following naming conventions are used:
+
+* *perltidy*: Refers to the command line application [perltidy](http://perltidy.sourceforge.net/), which does the heavy lifting and tidies up messy Perl source code.
+
+* *PerlTidy*: Refers to this Sublime Text plugin. This is also the name of this plugin within Sublime Text.
+
+* *SublimePerlTidy*: This is the name of the GitHub repository which contains this plugin.
+
+* *st2-perltidy*: This is the old name of this plugin, initially published by [Robert Bohne (rbo)](https://github.com/rbo/). It has been renamed in order to match the Sublime Text plugin naming conventions.
 
 ## Installation
 
-**With Sublime Package Control:**  The easiest way to install PerlTidy is through [Sublime Package Control](http://wbond.net/sublime_packages/package_control).
+* **With Sublime Package Control:** The easiest way to install PerlTidy is through [Sublime Package Control](http://wbond.net/sublime_packages/package_control). If you're not using it yet, get it. Seriously.
 
-Once you have installed Package Control, restart Sublime Text 2 and bring up the Command Palette (press `Control+Shift+P` on Linux/Windows, `Command+Shift+P` on OS X, or select `Tools->Command Palette...` from menu). Select "Package Control: Install Package", wait till Package Control fetches the latest package list, then select "PerlTidy" from the list of available packages. The advantage of using this method is, that Package Control will automatically keep PerlTidy up to date with the latest version.
+  Once you have installed Package Control, restart Sublime Text and bring up the Command Palette (press `Control+Shift+P` on Linux/Windows, `Command+Shift+P` on OS X, or select `Tools->Command Palette...` from menu). Select *Package Control: Install Package*, wait till latest package list has been fetched, then select *PerlTidy* from the list of available packages.
 
-**Without Git:** Download the latest source from [GitHub](https://github.com/rbo/st2-perltidy/downloads) and copy the folder *st2-perltidy* to your Sublime Text *Packages* directory.
+* **With Git:** Clone the repository in your Sublime Text *Packages* directory. Please note that the destination directory must be *PerlTidy*.
 
-**With Git:** Clone the repository in your Sublime Text *Packages* directory:
+        git clone https://github.com/vifo/SublimePerlTidy PerlTidy
 
-    git clone https://github.com/rbo/st2-perltidy
+The advantage of using either Package Control or git is, that the plugin will be automatically kept up-to-date with the latest version.
 
-The *Packages* directory is located at:
+* **From ZIP:** Download the latest version [as a ZIP archive](https://github.com/vifo/SublimePerlTidy/archive/master.zip) and copy the directory "SublimePerlTidy-master" from the archive to your Sublime Text *Packages* directory. Rename directory "SublimePerlTidy-master" to "PerlTidy".
 
-* OS X:
+The *Packages* directory locations are listed below. If using Sublime Text 3, be sure to replace "2" with "3" in directory names.  Alternatively, selecting `Preferences->Browse Packages...` from Sublime Text menu will get you to the *Packages* directory also.
 
-    ~/Library/Application Support/Sublime Text 2/Packages/
+| OS            | Packages location                                         |
+| ------------- | --------------------------------------------------------- |
+| OS X          | `~/Library/Application Support/Sublime Text 2/Packages/`  |
+| Linux         | `~/.config/sublime-text-2/Packages/`                      |
+| Windows       | `%APPDATA%\Sublime Text 2\Packages\`                      |
 
-* Linux:
+## Usage
 
-    ~/.config/sublime-text-2/Packages/
+After PerlTidy installation, open a Perl file of your choice and:
 
-* Windows:
+* hit `Control+Shift+t`
+* or open Command Palette, start typing "perltidy", select "PerlTidy: Tidy" and hit return
 
-    %APPDATA%\Sublime Text 2\Packages\
+to reformat the entire file. PerlTidy also works on selected text only. Give it a try.
 
 ## Configuration
+
+Though usage of PerlTidy is quite simple and PerlTidy will do its very best to Just Work™, most aspects can be configured to suite your needs.
 
 ### perltidy locations
 
@@ -46,7 +75,11 @@ PerlTidy will try to locate perltidy by:
 
   ```"perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]```
 
-  Default [ActivePerl](http://www.activestate.com/activeperl) installation location *C:\Perl*, i.e.:
+  Default [ActivePerl 64-bit](http://www.activestate.com/activeperl) installation location *C:\Perl64*, i.e.:
+
+  ```"perltidy_cmd": [ "C:\\Perl64\\bin\\perl.exe", "C:\\Perl64\\site\\bin\\perltidy" ]```
+
+  Default [ActivePerl 32-bit](http://www.activestate.com/activeperl) installation location *C:\Perl*, i.e.:
 
   ```"perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]```
 
@@ -54,51 +87,58 @@ PerlTidy will try to locate perltidy by:
 
   ```"perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]```
 
-* On Linux and OSX:
+* On Linux and OS X:
 
-  */usr/bin/perltidy*, */usr/local/bin/perltidy* (which will most likely be in your *PATH* anyway).
+  */usr/bin/perltidy*, */usr/local/bin/perltidy* (which will most likely be in your *PATH* anyway), i.e.:
+
+  ```"perltidy_cmd": [ "/usr/bin/perltidy" ]```
 
 Let PerlTidy try to locate perltidy first. If this does not work, adjust user setting "perltidy_cmd" as needed.
 
-### Default perltidy options
+### perltidy options
 
-The default perltidy options are set as follows (you may override them by changing user setting "perltidy_options" in your preferences). Please refer to the official [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
+By default, PerlTidy uses perltidy options as suggested in Damian Conway's [Perl Best Practices (PBP)](http://en.wikipedia.org/wiki/Perl_Best_Practices). Though I don't agree with all of the perltidy settings in the PBP set, using them results in slightly better readable Perl code, than using perltidy's defaults. Since perltidy already supports the PBP set using the command line switch `-pbp` or `--perl-best-practices`, introducing just another set of options seems unnecessary.
 
-* -sbl
+So the default PerlTidy options are:
 
-  Opening sub braces on new line. Details: [perltidy Documentation | Opening Sub Brace On New Line](http://perltidy.sourceforge.net/perltidy.html#sbl_opening_sub_brace_on_new_line).
+    "perltidy_options": [ "-pbp" ]
 
-* -bbt=1
+which, at least with a recent perltidy version is effectively the same as:
 
-   Block brace tightness. Details: [perltidy Documentation | Tightness of curly braces, parentheses, and square brackets](http://perltidy.sourceforge.net/perltidy.html#tightness_of_curly_braces_parentheses_and_square_brackets).
+    "perltidy_options": [
+        "-l=78", "-i=4", "-ci=4", "-vt=2", "-cti=0", "-pt=1", "-bt=1", "-sbt=1", "-bbt=1", "-nsfs", "-nolq",
+        "-wbb=\"% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=\"",
+        "-st", "-se"
+    ]
 
-* -pt=2
+Ermmm, what?! Fear not, here are the explanations (and differences with perltidy defaults):
 
-  Parens tightness. Details: [perltidy Documentation | Tightness of curly braces, parentheses, and square brackets](http://perltidy.sourceforge.net/perltidy.html#tightness_of_curly_braces_parentheses_and_square_brackets).
+| PBP Option      | perltidy Defaults | Description                                                   |
+| --------------- | ----------------- | ------------------------------------------------------------- |
+| `-l=78`         | `-l=80`           | Maximum line width is 78/80 columns                           |
+| `-i=4`          | *same*            | Use 4 columns per indentation level                           |
+| `-ci=4`         | `-ci=2`           | Continuation indentation is 4/2 columns                       |
+| `-vt=2`         | `-vt=0`           | Vertical tightness set to maximum/minimum                     |
+| `-cti=0`        | *same*            | No extra indentation for closing tokens                       |
+| `-pt=1`         | *same*            | Medium parenthesis tightness                                  |
+| `-bt=1`         | *same*            | Medium brace tightness                                        |
+| `-sbt=1`        | *same*            | Medium square bracket tightness                               |
+| `-bbt=1`        | `-bbt=0`          | Medium/minimal block brace tightness                          |
+| `-nsfs`         | `-sfs`            | Additional space for semicolons in for loops disabled/enabled |
+| `-nolq`         | `-olq`            | Outdenting of overly long quoted strings disabled/enabled     |
+| `-wbb="..."`    | *none*            | Break before these tokens (operators)                         |
+| `-st`           | *none*            | Output to STDOUT                                              |
+| `-se`           | *none*            | Errors to STDERR                                              |
 
-* -nbbc
+You may override any of the above settings by changing user setting "perltidy_options" in your preferences, preferably including the `-pbp` option like this:
 
-  No blanks before comments. Details: [perltidy Documentation | Blank Line Control](http://perltidy.sourceforge.net/perltidy.html#blank_line_control).
+    "perltidy_options": [ "-pbp", "-l=120" ]
 
-* -l=100
-
-  Maximum line length is 100 characters. Details: [perltidy Documentation | Maximum Line Length](http://perltidy.sourceforge.net/perltidy.html#l_n_maximum_line_length_n).
-
-* -ole=unix
-
-  Output line endings are UNIX style. Details: [perltidy Documentation | Output Line Endings](http://perltidy.sourceforge.net/perltidy.html#ole_s_output_line_ending_s).
-
-* -w
-
-  All warnings enabled. Details: [perltidy Documentation | Warning Output](http://perltidy.sourceforge.net/perltidy.html#w_warning_output).
-
-* -se
-
-  Errors go to STDERR. **Please ensure, that you include this settings, when changing default options.** Otherwise, perltidy error messages won't appear in a separate window. Details: [perltidy Documentation | Standard Error Output](http://perltidy.sourceforge.net/perltidy.html#se_standard_error_output).
+Please refer to the official [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
 
 ### Key bindings
 
-Defaults to `Control+Shift+t` for Windows/Linux and `Command+Shift+t` for OS X, since `Control+t` is used by some other plugins. Change in `Preferences->Key Bindings - User` by adding and adjusting following lines:
+Defaults to `Control+Shift+t` on all platforms. Feel free to change this in `Preferences->Key Bindings - User` by adding and adjusting following lines:
 
     // PerlTidy key bindings
     {
@@ -107,7 +147,7 @@ Defaults to `Control+Shift+t` for Windows/Linux and `Command+Shift+t` for OS X, 
         "context": [ { "key": "selector", "operator": "equal", "operand": "source.perl", "match_all": true } ]
     }
 
-### Settings
+### Other settings
 
 If you'd like to override specific settings, open `Preferences->Settings - User` and add/adjust the following lines:
 
@@ -127,9 +167,9 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     // Windows/Cygwin:
     //"perltidy_cmd": [ "C:\\cygwin\\bin\\perl.exe", "/usr/local/bin/perltidy" ]
     //
-    // Linux/OSX with non-standard location or explicit Perl interpreter:
+    // Linux/OS X with non-standard location or explicit Perl interpreter:
     //"perltidy_cmd": "/opt/perl/bin/perltidy"
-    //"perltidy_cmd": [ "/opt/perl-5.16.2/bin/perl", "/opt/perl-5.10.1/site/bin/perltidy" ]
+    //"perltidy_cmd": [ "/opt/perl-5.18.0/bin/perl", "/opt/perl-5.16.3/site/bin/perltidy" ]
 
     // Specify possible perltidyrc files to search for within current project. The
     // first matching perltidyrc will be used. Absolute paths may also be used, if
@@ -137,13 +177,14 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     //"perltidy_rc_paths": [ ".perltidyrc", "perltidyrc" ]
     //"perltidy_rc_paths": [ "C:\\Users\\USERNAME\\AppData\\Roaming\\perltidyrc" ]
 
-    // Specify perltidy options. Defaults to: [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
-    //"perltidy_options": [ "-sbl", "-bbt=1", "-pt=2", "-nbbc", "-l=100", "-ole=unix", "-w", "-se" ]
+    // Specify perltidy options. Defaults to: [ "-pbp" ]
+    //"perltidy_options": [ "-pbp" ]
 
     // Specify, whether perltidy options given in "perltidy_options" take
-    // precedence over options found in perltidyrc files. Defaults to "true".
-    // Adjust to "false" to reverse this order.
-    //"perltidy_options_take_precedence": true
+    // precedence over options found in perltidyrc files. Defaults to "false"
+    // (note: default value was "true" up to version 0.4.0). Adjust to "true" to
+    // reverse this order.
+    //"perltidy_options_take_precedence": false
 
     // Specify, whether PerlTidy should always use temporary files, instead
     // of process pipes to filter code. Using temporary files is slower, but
@@ -161,6 +202,8 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     // "perltidy_enabled" to false. Defaults to true.
     //"perltidy_enabled": true
 
+### Per project settings
+
 You may override any of these settings per project, by adding a section named "settings" with overridden settings to your project file:
 
     {
@@ -171,13 +214,13 @@ You may override any of these settings per project, by adding a section named "s
         ],
         "settings": {
             "perltidy_log_level": 2,
-            "perltidy_options": [ "-l=120", "-ole=unix", "-w", "-se" ]
+            "perltidy_options": [ "-pbp", "-l=120", "-w" ]
         }
     }
 
 ## Troubleshooting
 
-During normal operation, PerlTidy will emit warnings and errors to the Sublime Text 2 console (open with ``Control+` `` or select `View->Show Console` from menu). In order to enable additional diagnostic messages, adjust user setting "perltidy_log_level" as follows:
+During normal operation, PerlTidy will emit warnings and errors to the Sublime Text console (open with ``Control+` `` or select `View->Show Console` from menu). In order to enable additional diagnostic messages, adjust user setting "perltidy_log_level" as follows:
 
 * 0 == Warnings and error messages only. This is the default.
 
@@ -189,7 +232,7 @@ During normal operation, PerlTidy will emit warnings and errors to the Sublime T
 
 #### Windows Error 193
 
-You are running Strawberry Perl/ActivePerl on Windows, and have set a custom path to perltidy via user setting "perltidy_cmd". While trying to run, PerlTidy bails out with the following error message on the ST2 console:
+You are running Strawberry Perl/ActivePerl on Windows, and have set a custom path to perltidy via user setting "perltidy_cmd". While trying to run, PerlTidy bails out with the following error message on the ST console:
 
     PerlTidy: Unable to run perltidy: "C:\Strawberry\perl\site\bin\perltidy" ...
     PerlTidy: OS error was: WindowsError(193, '...')
@@ -197,17 +240,19 @@ You are running Strawberry Perl/ActivePerl on Windows, and have set a custom pat
 
 You have specified the path to the raw Perl "perltidy" file (without extension), instead of the batch wrapper file "perltidy.bat". Windows is unable to execute the former file directly. Yes, typing "perltidy" in *cmd.exe* will work, but only due to the way, how *cmd.exe* handles files without an extension: it will try extensions specified in environment variable *PATHEXT*, eventually find the file "perltidy.bat" and run it.
 
-TL/DR: Assuming you are running a vanilla Strawberry Perl/ActivePerl installation: adjust user setting "perltidy_cmd" to one of the following:
+TL;DR: Assuming you are running a vanilla Strawberry Perl/ActivePerl installation: adjust user setting "perltidy_cmd" to one of the following:
 
     "perltidy_cmd": [ "C:\\Strawberry\\perl\\bin\\perl.exe", "C:\\Strawberry\\perl\\site\\bin\\perltidy" ]    # for Strawberry Perl
-    "perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]                            # for ActivePerl
+    "perltidy_cmd": [ "C:\\Perl64\\bin\\perl.exe", "C:\\Perl64\\site\\bin\\perltidy" ]                        # for ActivePerl 64-bit
+    "perltidy_cmd": [ "C:\\Perl\\bin\\perl.exe", "C:\\Perl\\site\\bin\\perltidy" ]                            # for ActivePerl 32-bit
 
 or, if you really need to use the batch wrapper for some (non-obvious) reasons, to:
 
     "perltidy_cmd": "C:\\Strawberry\\perl\\site\\bin\\perltidy.bat"       # for Strawberry Perl
-    "perltidy_cmd": "C:\\Perl\\site\\bin\\perltidy.bat"                   # for ActivePerl
+    "perltidy_cmd": "C:\\Perl64\\site\\bin\\perltidy.bat                  # for ActivePerl 64-bit
+    "perltidy_cmd": "C:\\Perl\\site\\bin\\perltidy.bat"                   # for ActivePerl 32-bit
 
-or just let PerlTidy figure out where perltidy is located by *not setting* "perltidy_cmd" at all.
+or just let PerlTidy figure out where perltidy is located by **not setting** "perltidy_cmd" at all.
 
 ## Reporting bugs
 
@@ -217,15 +262,27 @@ In order to make bug hunting easier, please ensure, that you always run the *lat
 
 * Operating system architecture (i.e. 32-bit, 64-bit)
 
-* Sublime Text 2 build number (open `Help->About`)
+* Sublime Text build number (open `Help->About`)
 
-* Output from Sublime Text 2 console
+* Output from Sublime Text console
 
-To gather this information quickly, open ST2 console, type in the following Python code as-is (in one line) and include its output in your issue:
+To gather this information quickly, open ST console, type in the following Python code as-is (in one line) and include its output in your issue:
 
+```python
+from __future__ import print_function, unicode_literals;import platform, sublime, datetime;print('-' * 78);print('Date/time: {0}'.format(datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S +0000')));print('Sublime Text version: {0}'.format(sublime.version()));print('Platform: {0}'.format(sublime.platform()));print('CPU architecture: {0}'.format(sublime.arch()));print('OS info: {0}'.format(repr(platform.platform())));print('-' * 78)
 ```
-import platform; import sublime; import datetime; print '-' * 78; print "Date/time: " + datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S +0000'); print "ST2 version: " + sublime.version(); print "ST2 platform: " + sublime.platform(); print "CPU architecture: " + sublime.arch(); print "OS info: " + repr(platform.platform()); print '-' * 78
-```
+
+## Miscellaneous
+
+### Standalone perltidy executable for Windows
+
+If you're running Sublime Text on Windows and don't like to install a complete Perl interpreter just for using perltidy, grab the standalone perltidy executable [from here](https://perltidy.s3.amazonaws.com/perltidy-20121207-x86.exe) and adjust your settings:
+
+    "perltidy_cmd": [ "C:\\WHEREVER_YOU_HAVE_DOWNLOADED_THE_EXE_TO\\perltidy-20121207-x86.exe" ]
+
+This executable has been built with [ActiveState ActivePerl 5.16.3.1603 x86](http://www.activestate.com/activeperl/downloads) using [PAR::Packer](https://metacpan.org/search?q=PAR%3A%3APacker+pp). It contains the Perl interpreter as well as the latest version of perltidy, including all required dependencies in a self contained executable (thus the size of 4.5 MB).
+
+Please note: this executable works for me and is provided **as-is**, with no support whatsoever. If it also works for you, great! If not, please don't complain, but get a Perl interpreter and perltidy for Windows instead. Even better: fix errors, repackage (maybe using helper script "helpers/build_perltidy_20121207_x86.pl" as a starting point) and provide final executable to me for hosting on S3.
 
 ## TODOs
 
@@ -233,90 +290,30 @@ import platform; import sublime; import datetime; print '-' * 78; print "Date/ti
 
 ## Changes
 
-### v0.2.1 2013-04-13 14:38:00 +0200
+Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/CHANGES.markdown) for all changes.
 
-Version number bumped. Latest package was missing in package repository.
+### v0.4.1 2013-06-23 18:00:00 +0200
 
-### v0.2.0 2012-12-20 09:45:00 +0100
+* Fixed bug with empty rows (CRLFs) being inserted into formatted source
+  code under Windows. Fixes #17. (vifo)
+* Support and tests for ActivePerl 64-bit added. (vifo)
 
-Cygwin support added. Tests added. Settings now reloaded on each PerlTidy run.
+### v0.4.0 2013-05-31 20:00:00 +0200
 
-* User setting "perltidy_options_take_precedence" added. If set to "true",
-  which is the default, options from user setting "perltidy_options" will take
-  precedence over options found in perltidyrc files. (vifo)
-* Running Perl/perltidy under Cygwin is now supported. PerlTidy will set required
-  environment variables, if running on Windows, so we won't get any warnings
-  from Cygwin/Perl (i.e. LANG="C" and CYGWIN+="nodosfilewarning"). (vifo)
-* Added automatic detection of perltidy in default installations of Strawberry
-  Perl/ActivePerl/Cygwin on Windows. (vifo)
-* Settings are now reloaded on each run of PerlTidy. (vifo)
-* Now using sublime.platform() instead of os.name for getting platform name.
+* Sublime Text 3 support added. Most of porting to Python 3 has been done
+  using information from http://python3porting.com/noconv.html. (vifo)
+* Default perltidy options changed. PerlTidy will now use the PBP set of
+  perltidy options. (vifo)
+* Default key binding for OS X changed from `Command+Shift+t` to
+  `Control+Shift+t`, the former fires a terminal. (vifo)
+* Options found in perltidyrc files will now override default/user options.
+  The former processing of perltidy options was counter-intuitive. Old
+  behavior can be restored by setting "perltidy_options_take_precedence" to
+  "true" in user settings. (vifo)
+* Error output from perltidy is now displayed via class
+  PerlTidyErrorOutputCommand, ST3 restricts editing of view contents. (vifo)
+* Fixed Python code used for bug reports and added helper script
+  "helpers/create_issue_sys_info.pl" used to generate the required one-liner.
   (vifo)
-* Now catching EnvironmentError exceptions instead of OSError in
-  tidy_region(). This will also catch IOError exceptions, which previously
-  were not catched at all. (vifo)
-* Added messages to be displayed by Package Control on installation and
-  upgrades in "messages/". Added "messages.json" to link the messages. (vifo)
-* Removed accessors: get_perltidy_options(), get_perltidy_rc_paths(). (vifo)
-* Refactored most of the code and moved it to perltidy/helpers.py, so we can
-  test it, without mocking too much. (vifo)
-* Documentation improved. (vifo)
-
-### v0.1.0 - 2012-11-26 19:20:35 +0100
-
-* WindowsError 6 "Invalid handle" occured, while running perltidy via
-  subprocess and using temporary files for I/O with perltidy. The error
-  occured, because we were not passing PIPEs for STDIN/STDOUT to subprocess.
-  This seems to occur on Windows XP only and is somehow related to
-  http://bugs.python.org/issue3905. Fixed by always providing subprocess.PIPE
-  for all three handles. (vifo)
-* Exception handling for running perltidy added. Errors will be checked for
-  some common errors and additional hints will be printed on the ST2 console.
-  (vifo)
-* Restructured code and moved perltidy command validation to
-  is_valid_perltidy_cmd(). (vifo)
-* get_perltidy_rc_path() renamed to find_perltidyrc_in_project(). (vifo)
-* Default settings now in DEFAULT_SETTINGS. (vifo)
-* User will now get a warning, if the command provided in "perltidy_cmd" is
-  invalid. (vifo)
-* When running on Windows, will now search for "perltidy.bat" instead of
-  "perltidy", if user did not specify "perltidy_cmd". (vifo)
-* Changed subprocess handling. Now using Shell=False, when running commands, so
-  we won't have to escape arguments, before passing them to perltidy. This will
-  most likely fix issue #3, though I am not able to test it. (vifo)
-* Changed passing input to perltidy/reading output from perltidy. If the data
-  to be tidied contains any non-ASCII characters, temporary files will be used
-  to pass/read data. This allows us for non-ASCII data to be handled correctly.
-  Fixes: issue #4. (vifo)
-* Added debugging messages. Verbosity level can be set by user in
-  "perltidy_log_level". (vifo)
-* Reformatted JSON sublime-keymap files. (vifo)
-* Fixed #7. Apparently, the Sublime Text 2 API changed and method names are now
-  underscored in Sublime Text 2 API. This broke opening of the error output
-  view. Not sure, whether compatibiity with earlier ST2 APIs might be an issue?
-  (vifo)
-* Removed '-sbdl' from default PerlTidy options and added '-sbl'. '-sbdl' is an
-  unknown option. (vifo)
-* All configuration settings are now user configurable, with sane fallback
-  values. In addition to "perltidy_cmd", now also "perltidy_options" and
-  "perltidy_default_rc_paths" may be specified. (vifo)
-* Changed "perltidy_cmd" handling. Now, its value may also be an array,
-  specifying where the Perl interpreter and where PerlTidy is separately, i.e.
-  [ "C:\\strawberry\\perl\\bin\\perl.exe", "C:\\strawberry\\perl\\site\\bin\\perltidy" ]
-  instead of using wrapper "C:\\strawberry\\perl\\site\\bin\\perltidy.bat".
-  Useful on Windows systems, or where the shebang in perltidy specifies a wrong
-  Perl interpreter. (vifo)
-* "perltidy_rc_paths" now allows the user to specify possible perltidy.rc
-  locations. Full file paths are also allowed and will be handled properly.
-  Note that now only the first perltidy.rc found in project will be used.  This
-  prevents error messages from perltidy. (vifo)
-* Output from PerlTidy is now only inserted, if no error occured while running
-  PerlTidy. (vifo)
-* Cursor repositioning after running PerlTidy is done now only, if no error
-  occured running PerlTidy. (vifo)
-* Improve the documentation. (vifo)
-* Fix error in commands file (kassi)
-
-### v0.0.1 - 2012-07-25 22:00:00 +0100
-
-* Initial version
+* Documentation updated, Package Control messages updated. (vifo)
+* Full changelog moved to CHANGES.markdown. (vifo)

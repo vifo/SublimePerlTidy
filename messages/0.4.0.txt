@@ -1,0 +1,26 @@
+perltidy for Sublime Text 2/3
+=============================
+
+Version: 0.4.0
+
+What's new?
+-----------
+
+* Sublime Text 3 support added.
+
+* Default key binding for OS X changed from `Command+Shift+t` to
+  `Control+Shift+t`, the former fires a terminal.
+
+* Default perltidy options changed. PerlTidy will now use a set of perltidy
+  options, as suggested by Damian Conway's Perl Best Practices (PBP).
+
+* Options found in perltidyrc files will now override default/user options.
+  The former processing of perltidy options was counter-intuitive. Old
+  behavior can be restored by setting "perltidy_options_take_precedence" to
+  "true" in user settings.
+
+Please refer to:
+
+    https://github.com/vifo/SublimePerlTidy
+
+for full documentation.

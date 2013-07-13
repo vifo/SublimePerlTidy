@@ -1,11 +1,13 @@
 *.pyc
 *.sublime-project
+.cover
 .coverage
 .pythoscope
 COMMIT
-htmlcov
+cover/
+helpers/build/
+htmlcov/
 misc
+nohup.out
 perltidyrc
 test*.pl
-nohup.out
-

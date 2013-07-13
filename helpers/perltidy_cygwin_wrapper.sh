@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Sublime Text 2 PerlTidy Cygwin wrapper.
+# Sublime Text 2/3 PerlTidy Cygwin wrapper.
 #
 # Use, when running under Windows with Cygwin and getting warnings from
 # Perl/Cygwin. Sets locale, so Perl does not complain and lets Cygwin accept

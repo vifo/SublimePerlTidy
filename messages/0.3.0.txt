@@ -1,0 +1,18 @@
+perltidy for Sublime Text 2
+===========================
+
+Version: 0.3.0
+
+What's new?
+-----------
+
+* Plugin has been renamed from st2-perltidy to SublimePerlTidy. It now appears
+  as "PerlTidy" in Sublime Text Package Control.
+
+* Transferred from rbo/st2-perltidy to vifo/SublimePerlTidy.
+
+Please refer to:
+
+    https://github.com/vifo/SublimePerlTidy
+
+for full documentation.
