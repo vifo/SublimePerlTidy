@@ -4,10 +4,13 @@ from __future__ import print_function, unicode_literals
 import sublime
 import sublime_plugin
 
+
 try:
     from .perltidy.helpers import *
+    from .perltidy import sublime_mixins
 except (Exception) as e:
     from perltidy.helpers import *
+    from perltidy import sublime_mixins
 
 
 DEFAULT_SETTINGS = {
@@ -16,17 +19,15 @@ DEFAULT_SETTINGS = {
     'perltidy_options': ['-pbp'],
     'perltidy_options_take_precedence': False,
     'perltidy_rc_paths': ['.perltidyrc', 'perltidyrc'],
-    'perltidy_use_temporary_files': 'auto',
 }
 
 
 class PerlTidyCommand(sublime_plugin.TextCommand):
 
-    _perltidy_cmd                 = None
-    _perltidy_log_level           = None
-    _perltidy_options             = None
-    _perltidy_rc_paths            = None
-    _perltidy_use_temporary_files = None
+    _perltidy_cmd = None
+    _perltidy_log_level = None
+    _perltidy_options = None
+    _perltidy_rc_paths = None
 
     # Try to locate perltidy and set self._perltidy_cmd.
     def find_perltidy(self):
@@ -78,8 +79,6 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
         if reload or self._perltidy_log_level is None:
             self._perltidy_log_level = settings.get('perltidy_log_level', DEFAULT_SETTINGS['perltidy_log_level'])
-        if reload or self._perltidy_use_temporary_files is None:
-            self._perltidy_use_temporary_files = settings.get('perltidy_use_temporary_files', DEFAULT_SETTINGS['perltidy_use_temporary_files'])
         if reload or self._perltidy_options is None:
             self._perltidy_options = settings.get('perltidy_options', DEFAULT_SETTINGS['perltidy_options'])
         if reload or self._perltidy_options_take_precedence is None:
@@ -113,23 +112,15 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 'https://github.com/vifo/SublimePerlTidy for details.')
             return
 
-        # Check, if we have any non-empty regions and tidy them.
-        regions_tidied = 0
-        for region in self.view.sel():
-            if not region.empty():
-                regions_tidied += 1
-                self.tidy_region(edit, region)
+        # Mix in additional methods into view instance.
+        view = sublime_mixins.enhance_sublime_view_instance(self.view)
 
-        # If no regions have been tidied so far, go ahead and tidy entire
-        # view. Reposition cursor after tidying up.
-        if regions_tidied == 0:
-            cursor_pos = self.view.sel()[0]
-            if self.tidy_region(edit, sublime.Region(0, self.view.size())):
-                if cursor_pos.empty():
-                    self.view.sel().add(cursor_pos)
-                    if len(self.view.sel()) > 1:
-                        self.view.sel().subtract(self.view.sel()[1])
-                    self.view.show_at_center(self.view.sel()[0].begin())
+        selections = view.sel_non_empty()
+        if len(selections):
+            for region in selections:
+                self.tidy_region(edit, region)
+        else:
+            self.tidy_region(edit, view.whole_buffer_region(), method='warm')
 
     # Build perltidy command to be run, including any options.
     def build_perltidy_cmd(self):
@@ -153,14 +144,16 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
 
     # Tidy given region; returns True on success or False on perltidy runtime
     # error.
-    def tidy_region(self, edit, region):
+    def tidy_region(self, edit, region, method='default'):
+
+        view = self.view
 
         # Run perltidy.
         success, output, error_output, error_hints = run_perltidy(
-            cmd=self.build_perltidy_cmd(), input=self.view.substr(region), logger=self)
+            cmd=self.build_perltidy_cmd(), input=view.substr(region), logger=self)
 
         if success:
-            self.view.replace(edit, region, output)
+            view.replace_contents(edit, region, output, method)
             return True
 
         if len(error_hints):
@@ -168,7 +161,7 @@ class PerlTidyCommand(sublime_plugin.TextCommand):
                 self.log(0, hint)
 
         if error_output:
-            error_output_view = self.view.window().new_file()
+            error_output_view = view.window().new_file()
             error_output_view.set_scratch(True)
             error_output_view.set_name('PerlTidy: Error output')
             error_output_view.run_command('perl_tidy_error_output', {'output': error_output})

@@ -237,7 +237,7 @@ def pp(string):
 
 # Tidy given region; returns True on success or False on perltidy runtime
 # error.
-def run_perltidy(cmd, input, use_temporary_files='auto', logger=PerlTidyNullLogger()):
+def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
     """Run perltidy using given "cmd" and "input".
 
     Runs perltidy specified by "cmd" and passes data given in "input" to
