@@ -285,28 +285,12 @@ Please note: this executable works for me and is provided **as-is**, with no sup
 
 Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/CHANGES.markdown) for all changes.
 
+### v0.4.2 2013-11-09 13:27:11 +0100
+
+* Update Package Control repository.json schema to version 2.0. (vifo)
+
 ### v0.4.1 2013-06-23 18:00:00 +0200
 
 * Fixed bug with empty rows (CRLFs) being inserted into formatted source
   code under Windows. Fixes #17. (vifo)
 * Support and tests for ActivePerl 64-bit added. (vifo)
-
-### v0.4.0 2013-05-31 20:00:00 +0200
-
-* Sublime Text 3 support added. Most of porting to Python 3 has been done
-  using information from http://python3porting.com/noconv.html. (vifo)
-* Default perltidy options changed. PerlTidy will now use the PBP set of
-  perltidy options. (vifo)
-* Default key binding for OS X changed from `Command+Shift+t` to
-  `Control+Shift+t`, the former fires a terminal. (vifo)
-* Options found in perltidyrc files will now override default/user options.
-  The former processing of perltidy options was counter-intuitive. Old
-  behavior can be restored by setting "perltidy_options_take_precedence" to
-  "true" in user settings. (vifo)
-* Error output from perltidy is now displayed via class
-  PerlTidyErrorOutputCommand, ST3 restricts editing of view contents. (vifo)
-* Fixed Python code used for bug reports and added helper script
-  "helpers/create_issue_sys_info.pl" used to generate the required one-liner.
-  (vifo)
-* Documentation updated, Package Control messages updated. (vifo)
-* Full changelog moved to CHANGES.markdown. (vifo)

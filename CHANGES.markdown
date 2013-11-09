@@ -2,6 +2,10 @@
 
 ## Changes
 
+### v0.4.2 2013-11-09 13:27:11 +0100
+
+* Update Package Control repository.json schema to version 2.0.
+
 ### v0.4.1 2013-06-23 18:00:00 +0200
 
 * Fixed bug with empty rows (CRLFs) being inserted into formatted source
