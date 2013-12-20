@@ -15,6 +15,13 @@
             "issues": "https://github.com/vifo/SublimePerlTidy/issues",
             "releases": [
                 {
+                    "version": "0.4.3",
+                    "date": "2013-12-20 18:30:00",
+                    "platforms": "*",
+                    "sublime_text": "*",
+                    "url": "https://nodeload.github.com/vifo/SublimePerlTidy/zip/v0.4.3"
+                },
+                {
                     "version": "0.4.2",
                     "date": "2013-11-09 12:27:11",
                     "platforms": "*",

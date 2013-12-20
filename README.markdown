@@ -285,12 +285,11 @@ Please note: this executable works for me and is provided **as-is**, with no sup
 
 Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/CHANGES.markdown) for all changes.
 
+### v0.4.3 2013-12-20 18:30:00 +0100
+
+* Fix bug with calls to subprocess.Popen under Mac OS X 10.6.x/ST2/
+  Python 2.6.1. Fixes #21.
+
 ### v0.4.2 2013-11-09 13:27:11 +0100
 
-* Update Package Control repository.json schema to version 2.0. (vifo)
-
-### v0.4.1 2013-06-23 18:00:00 +0200
-
-* Fixed bug with empty rows (CRLFs) being inserted into formatted source
-  code under Windows. Fixes #17. (vifo)
-* Support and tests for ActivePerl 64-bit added. (vifo)
+* Update Package Control repository.json schema to version 2.0.

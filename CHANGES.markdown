@@ -2,6 +2,11 @@
 
 ## Changes
 
+### v0.4.3 2013-12-20 18:30:00 +0100
+
+* Fix bug with calls to subprocess.Popen under Mac OS X 10.6.x/ST2/
+  Python 2.6.1. Fixes #21.
+
 ### v0.4.2 2013-11-09 13:27:11 +0100
 
 * Update Package Control repository.json schema to version 2.0.

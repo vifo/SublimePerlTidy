@@ -365,7 +365,7 @@ class TestPerlTidyHelpersNonWindowsDefaultInterpreter(PerlTidyInterpreterTestCas
 
     def setUp(self):
         PerlTidyInterpreterTestCase.setUp(self)
-        self.perltidy_cmd = ['/usr/bin/perltidy', '-pbp', '-ole=unix']
+        self.perltidy_cmd = ['/usr/local/bin/perltidy', '-pbp', '-ole=unix']
 
         if is_windows():
             self.skip_reason = 'Running on Windows'

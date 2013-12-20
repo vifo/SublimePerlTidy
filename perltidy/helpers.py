@@ -14,6 +14,7 @@ import tempfile
 # Support Python 2.6/Python 3.x at same time with workarounds taken from
 # https://pypi.python.org/pypi/six
 PY3 = sys.version_info[0] == 3
+PY2 = sys.version_info[0] == 2
 
 if PY3:
     string_types = str,
@@ -301,6 +302,21 @@ def run_perltidy(cmd, input, logger=PerlTidyNullLogger()):
         cmd_final.append('-nst')
         cmd_final.append(perltidy_input_filepath)
         cmd_final.append('-o=' + perltidy_output_filepath)
+
+    # If running under Python 2.x, ensure that neither cmd_final nor
+    # subprocess_args contain unicode keys or values (convert to str).
+    # Otherwise we get a nice exception from subprocess.Popen().
+    if PY2:
+        cmd_final = map(lambda x: str(x) if isinstance(x, unicode) else x, cmd_final)
+        subprocess_args_final = {}
+
+        for k in subprocess_args.keys():
+            if isinstance(k, unicode):
+                subprocess_args_final[str(k)] = subprocess_args[k]
+            else:
+                subprocess_args_final[k] = subprocess_args[k]
+
+        subprocess_args = subprocess_args_final
 
     # Show time!
     success, output, error_output, error_hints = False, None, None, []
