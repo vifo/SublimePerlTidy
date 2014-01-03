@@ -1,7 +1,7 @@
 perltidy for Sublime Text 2/3
 =============================
 
-Version: 0.4.3
+Version: 0.4.4
 
 Thanks for installing PerlTidy! Below are some quick notes to get you started.
 Please refer to:

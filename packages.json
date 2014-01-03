@@ -6,7 +6,7 @@
             "description": "perltidy/Perl::Tidy plugin - A Perl script indenter and reformatter.",
             "author": "Victor Foitzik (vifo)",
             "homepage": "https://github.com/vifo/SublimePerlTidy",
-            "last_modified": "2013-12-10 18:30:01",
+            "last_modified": "2014-01-03 08:30:00",
             "labels": [
                 "formatting",
                 "perl",
@@ -14,6 +14,13 @@
             ],
             "issues": "https://github.com/vifo/SublimePerlTidy/issues",
             "releases": [
+                {
+                    "version": "0.4.4",
+                    "date": "2014-01-03 08:30:00",
+                    "platforms": "*",
+                    "sublime_text": "*",
+                    "url": "https://nodeload.github.com/vifo/SublimePerlTidy/zip/v0.4.4"
+                },
                 {
                     "version": "0.4.3",
                     "date": "2013-12-10 18:30:01",

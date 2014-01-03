@@ -2,6 +2,10 @@
 
 ## Changes
 
+### v0.4.4 2014-01-03 09:30:00 +0100
+
+* Bump version number in order to fix #22.
+
 ### v0.4.3 2013-12-20 18:30:00 +0100
 
 * Fix bug with calls to subprocess.Popen under Mac OS X 10.6.x/ST2/
