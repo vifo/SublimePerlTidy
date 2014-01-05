@@ -2,6 +2,12 @@
 
 ## Changes
 
+### v0.4.5 2014-01-05 22:15:00 +0100
+
+* Remove packages.json. Package Control versioning now done via git
+  tags/semantic versioning.
+* Stripped leading "v" from all tags.
+
 ### v0.4.4 2014-01-03 09:30:00 +0100
 
 * Bump version number in order to fix #22.

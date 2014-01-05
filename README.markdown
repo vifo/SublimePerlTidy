@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/vifo/SublimePerlTidy.png)](http://travis-ci.org/vifo/SublimePerlTidy)
 
-PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/) and [Sublime Text 3](http://www.sublimetext.com/3), which integrates the command line application [perltidy](http://perltidy.sourceforge.net/) into Sublime Text. It indents and reformats [Perl](http://www.perl.org/) source code to make it easier to read.
+PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/2)/[3](http://www.sublimetext.com/3), which integrates the command line application [perltidy](http://perltidy.sourceforge.net/) into Sublime Text. It indents and reformats [Perl](http://www.perl.org/) source code to make it easier to read.
 
 ## Quick start
 
@@ -12,21 +12,22 @@ PerlTidy is a plugin for [Sublime Text 2](http://www.sublimetext.com/) and [Subl
 
 Read on for detailed installation, usage, configuration and customization instructions.
 
-## Naming conventions
+#### Table of contents
 
-Throughout this documentation, the following naming conventions are used:
+* [Installation](#installation)
+* [Usage](#usage)
+* [Configuration](#configuration)
+* [Troubleshooting](#troubleshooting)
+* [Miscellaneous](#miscellaneous)
+* [TODOs](#todos)
+* [Say thanks](#say-thanks)
+* [Changes](#changes)
 
-* *perltidy*: Refers to the command line application [perltidy](http://perltidy.sourceforge.net/), which does the heavy lifting and tidies up messy Perl source code.
-
-* *PerlTidy*: Refers to this Sublime Text plugin. This is also the name of this plugin within Sublime Text.
-
-* *SublimePerlTidy*: This is the name of the GitHub repository which contains this plugin.
-
-* *st2-perltidy*: This is the old name of this plugin, initially published by [Robert Bohne (rbo)](https://github.com/rbo/). It has been renamed in order to match the Sublime Text plugin naming conventions.
+<a name="installation" />
 
 ## Installation
 
-* **With Sublime Package Control:** The easiest way to install PerlTidy is through [Sublime Package Control](http://wbond.net/sublime_packages/package_control). If you're not using it yet, get it. Seriously.
+* **With Sublime Package Control:** The easiest way to install PerlTidy is through [Sublime Package Control](https://sublime.wbond.net/). If you're not using it yet, get it. Seriously.
 
   Once you have installed Package Control, restart Sublime Text and bring up the Command Palette (press `Control+Shift+P` on Linux/Windows, `Command+Shift+P` on OS X, or select `Tools->Command Palette...` from menu). Select *Package Control: Install Package*, wait till latest package list has been fetched, then select *PerlTidy* from the list of available packages.
 
@@ -46,6 +47,8 @@ The *Packages* directory locations are listed below. If using Sublime Text 3, be
 | Linux         | `~/.config/sublime-text-2/Packages/`                      |
 | Windows       | `%APPDATA%\Sublime Text 2\Packages\`                      |
 
+<a name="usage" />
+
 ## Usage
 
 After PerlTidy installation, open a Perl file of your choice and:
@@ -53,11 +56,15 @@ After PerlTidy installation, open a Perl file of your choice and:
 * hit `Control+Shift+t`
 * or open Command Palette, start typing "perltidy", select "PerlTidy: Tidy" and hit return
 
-to reformat the entire file. PerlTidy also works on selected text only. Give it a try.
+to reformat the entire file. PerlTidy also works on selections. Give it a try.
+
+<a name="configuration" />
 
 ## Configuration
 
 Though usage of PerlTidy is quite simple and PerlTidy will do its very best to Just Work™, most aspects can be configured to suite your needs.
+
+<a name="configuration-perltidy-locations" />
 
 ### perltidy locations
 
@@ -94,6 +101,8 @@ PerlTidy will try to locate perltidy by:
   ```"perltidy_cmd": [ "/usr/bin/perltidy" ]```
 
 Let PerlTidy try to locate perltidy first. If this does not work, adjust user setting "perltidy_cmd" as needed.
+
+<a name="configuration-perltidy-options" />
 
 ### perltidy options
 
@@ -136,6 +145,8 @@ You may override any of the above settings by changing user setting "perltidy_op
 
 Please refer to the official [perltidy Documentation](http://perltidy.sourceforge.net/perltidy.html) and the [perltidy Style Guide](http://perltidy.sourceforge.net/stylekey.html) for an explanation of all options available.
 
+<a name="configuration-keybindings" />
+
 ### Key bindings
 
 Defaults to `Control+Shift+t` on all platforms. Feel free to change this in `Preferences->Key Bindings - User` by adding and adjusting following lines:
@@ -146,6 +157,8 @@ Defaults to `Control+Shift+t` on all platforms. Feel free to change this in `Pre
         "command": "perl_tidy",
         "context": [ { "key": "selector", "operator": "equal", "operand": "source.perl", "match_all": true } ]
     }
+
+<a name="configuration-other-settings" />
 
 ### Other settings
 
@@ -195,6 +208,8 @@ If you'd like to override specific settings, open `Preferences->Settings - User`
     // "perltidy_enabled" to false. Defaults to true.
     //"perltidy_enabled": true
 
+<a name="configuration-per-project-settings" />
+
 ### Per project settings
 
 You may override any of these settings per project, by adding a section named "settings" with overridden settings to your project file:
@@ -211,6 +226,8 @@ You may override any of these settings per project, by adding a section named "s
         }
     }
 
+<a name="troubleshooting" />
+
 ## Troubleshooting
 
 During normal operation, PerlTidy will emit warnings and errors to the Sublime Text console (open with ``Control+` `` or select `View->Show Console` from menu). In order to enable additional diagnostic messages, adjust user setting "perltidy_log_level" as follows:
@@ -220,6 +237,8 @@ During normal operation, PerlTidy will emit warnings and errors to the Sublime T
 * 1 == Print system commands used for tidying up content and perltidyrc file paths used (if any).
 
 * 2 == Full debugging. In addition to the above, print where PerlTidy searches for perltidy and/or perltidyrc.
+
+<a name="troubleshooting-common-pitfalls" />
 
 ### Common Pitfalls
 
@@ -247,6 +266,8 @@ or, if you really need to use the batch wrapper for some (non-obvious) reasons, 
 
 or just let PerlTidy figure out where perltidy is located by **not setting** "perltidy_cmd" at all.
 
+<a name="troubleshooting-reporting-bugs" />
+
 ## Reporting bugs
 
 In order to make bug hunting easier, please ensure, that you always run the *latest* version of PerlTidy. Apart from this, please ensure, that you've set PerlTidy log level to maximum (`"perltidy_log_level": 2` in user settings), in order to get all debugging information possible. Also please include the following information, when submitting an issue:
@@ -265,6 +286,8 @@ To gather this information quickly, open ST console, type in the following Pytho
 from __future__ import print_function, unicode_literals;import platform, sublime, datetime;print('-' * 78);print('Date/time: {0}'.format(datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S +0000')));print('Sublime Text version: {0}'.format(sublime.version()));print('Platform: {0}'.format(sublime.platform()));print('CPU architecture: {0}'.format(sublime.arch()));print('OS info: {0}'.format(repr(platform.platform())));print('-' * 78)
 ```
 
+<a name="miscellaneous" />
+
 ## Miscellaneous
 
 ### Standalone perltidy executable for Windows
@@ -277,19 +300,37 @@ This executable has been built with [ActiveState ActivePerl 5.16.3.1603 x86](htt
 
 Please note: this executable works for me and is provided **as-is**, with no support whatsoever. If it also works for you, great! If not, please don't complain, but get a Perl interpreter and perltidy for Windows instead. Even better: fix errors, repackage (maybe using helper script "helpers/build_perltidy_20121207_x86.pl" as a starting point) and provide final executable to me for hosting on S3.
 
+<a name="todos" />
+
 ## TODOs
 
-* Implement automatic tidying of Perl files upon save. Until then, [SublimeOnSaveBuild](https://github.com/alexnj/SublimeOnSaveBuild) might be an option to achieve this.
+* Implement automatic tidying of Perl files upon save. Until then, [ST2-CommandOnSave](https://github.com/klaascuvelier/ST2-CommandOnSave) might be an option to achieve this.
+
+<a name="say-thanks" />
+
+## Say thanks
+
+I spend a lot of my scarce free time working on this plugin, and would appreciate any support you'd care to offer. If using this plugin makes your coding life easier and more productive and you'd like to thank me, please consider:
+
+* making a donation via [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R28FLTNK6MBPQ)
+* [star](https://github.com/blog/1204-notifications-stars) this plugin on GitHub
+* twitter, blog or in general spread the word.
+
+Please note that you don't *have* to do *any of the above* in order for me to continue to work on this plugin. I will continue to do so, for as long as it interests me and inasmuch I have free time to spend. Similarly, a donation made in this way probably won't make me work on this plugin harder, unless I get so many donations that I can consider working on it full time (which at least for now seems unlikely at best).
+
+Thank You!
 
 ## Changes
 
 Only latest changes are listed here. Refer to [full change log](https://github.com/vifo/SublimePerlTidy/blob/master/CHANGES.markdown) for all changes.
 
+### v0.4.5 2014-01-05 22:15:00 +0100
+
+* Remove packages.json. Package Control versioning now done via git
+  tags/semantic versioning.
+* Stripped leading "v" from all tags.
+
 ### v0.4.4 2014-01-03 09:30:00 +0100
 
 * Bump version number in order to fix #22.
 
-### v0.4.3 2013-12-20 18:30:00 +0100
-
-* Fix bug with calls to subprocess.Popen under Mac OS X 10.6.x/ST2/
-  Python 2.6.1. Fixes #21.
